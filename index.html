@@ -698,17 +698,11 @@ function bootEngine(){
   requestAnimationFrame(engine);
 }
 
-/* Start after ALL scene registrations in this file have run */
-addEventListener('DOMContentLoaded', bootEngine);
-/* file is parsed at end of body — DOM is ready; also start immediately */
-if(document.readyState!=='loading'){
-  /* Defer one macrotask so every loop() below this point has registered */
-  setTimeout(bootEngine, 0);
-}
-
 addEventListener('resize',()=>{
   for(let i=0;i<SCENES.length;i++) resizeScene(SCENES[i]);
 },{passive:true});
+
+/* bootEngine() is invoked once at the bottom of this IIFE after every scene registers */
 
 /* ============================================================
    ACT 01 — ASCII FLUID (advection + heat diffusion)
@@ -1740,6 +1734,9 @@ addEventListener('resize',()=>{
   addEventListener('resize',onScroll,{passive:true});
   onScroll();
 })();
+
+/* Start the global animation clock AFTER every loop() registration above */
+bootEngine();
 
 })(); // end IIFE
 </script>
