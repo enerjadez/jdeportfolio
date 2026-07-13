@@ -125,7 +125,27 @@ body.has-cursor #cursor{display:block}
 
 .p1{background:var(--blue);color:#fff;border-radius:0}
 .p1 .display{max-width:16ch;text-shadow:0 2px 40px rgba(0,0,60,.4)}
-.p1 .cta-row{display:flex;gap:12px;margin-top:36px;flex-wrap:wrap}
+.p1 .cta-row{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
+.p1 .panel-inner{justify-content:center;padding-bottom:calc(var(--gutter)+24px+var(--safe-bottom))}
+/* Hero project constellation */
+.hero-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:10px;margin-top:32px;max-width:720px;width:100%;
+}
+.hero-card{
+  pointer-events:auto;display:flex;flex-direction:column;gap:4px;
+  padding:12px 14px;border-radius:12px;
+  border:1px solid rgba(255,255,255,.28);background:rgba(0,0,40,.25);
+  backdrop-filter:blur(8px);transition:transform .2s,background .2s,border-color .2s;
+  font-family:var(--mono);min-height:72px;text-align:left;
+}
+.hero-card:hover,.hero-card:focus-visible{
+  transform:translateY(-3px);background:rgba(255,255,255,.12);
+  border-color:#fff;outline:none;
+}
+.hero-card .hc-num{font-size:10px;letter-spacing:.14em;opacity:.55;text-transform:uppercase}
+.hero-card .hc-title{font-family:var(--sans);font-weight:600;font-size:14px;letter-spacing:-.01em}
+.hero-card .hc-tag{font-size:10px;opacity:.55;margin-top:auto}
 .btn{
   font-family:var(--mono);font-size:13px;letter-spacing:.06em;
   padding:14px 22px;border-radius:8px;border:1px solid rgba(255,255,255,.5);
@@ -143,11 +163,17 @@ body.has-cursor #cursor{display:block}
   background:linear-gradient(var(--line) 1px,transparent 1px) 0 0/100% 72px,linear-gradient(90deg,var(--line) 1px,transparent 1px) 0 0/72px 100%;
   opacity:.45;
 }
-.p2 .grid2{display:grid;grid-template-columns:1fr 1.1fr;gap:40px;align-items:center}
-.p2 .spec{font-family:var(--mono);font-size:13px;line-height:2.1;border-left:2px solid var(--blue);padding-left:22px;margin-top:26px}
+.p2 .grid2{display:grid;grid-template-columns:1fr 1.15fr;gap:36px;align-items:center}
+.p2 .spec{font-family:var(--mono);font-size:13px;line-height:2.1;border-left:2px solid var(--blue);padding-left:22px;margin-top:22px}
 .p2 .spec b{color:var(--blue)}
-.p2 .turbine-wrap{position:relative;aspect-ratio:1.15;max-height:66vh;max-height:66dvh;width:100%}
-.p2 .turbine-wrap canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
+.p2 .turbine-wrap{
+  position:relative;aspect-ratio:1;max-height:min(70vh,560px);width:100%;
+  border-radius:18px;border:1px solid rgba(0,0,242,.18);
+  background:radial-gradient(circle at 50% 45%,rgba(0,0,242,.04),transparent 65%);
+  box-shadow:0 20px 60px rgba(0,0,80,.06);
+}
+.p2 .turbine-wrap canvas{position:absolute;inset:0;width:100%!important;height:100%!important;border-radius:18px}
+.p2 .fan-hint{font-family:var(--mono);font-size:11px;opacity:.5;margin-top:12px}
 
 /* Launch + HUD */
 .p3{background:#07070f;color:var(--paper)}
@@ -186,17 +212,18 @@ body.has-cursor #cursor{display:block}
 .plife .lede{color:rgba(200,235,210,.88)}
 .plife .flow-legend{margin-top:24px;font-family:var(--mono);font-size:12px;line-height:2;border-left:2px solid var(--life-gold);padding-left:18px;opacity:.85;max-width:46ch;color:rgba(200,235,210,.8)}
 
-/* Great wave */
-.p6{background:var(--jp-sky);color:var(--jp-blue)}
-.p6 .panel-tab{border-color:rgba(22,52,79,.3)}
+/* Fourier / interference ocean */
+.p6{background:#071018;color:#d8e8f5}
+.p6 .panel-tab{border-color:rgba(180,210,240,.15)}
 .p6 .panel-inner{justify-content:flex-start;padding-top:calc(var(--gutter)+64px)}
-.p6 .display{font-size:clamp(32px,5.8vw,80px);color:var(--jp-blue)}
-.p6 .eyebrow{color:var(--jp-blue)}
+.p6 .display{font-size:clamp(32px,5.8vw,80px);color:#e8f2ff}
+.p6 .eyebrow{color:#6ec8ff;opacity:.95}
+.p6 .lede{color:rgba(200,220,240,.85)}
 .p6 .hanko{
-  display:inline-block;margin-top:20px;padding:10px 12px;border:2px solid #b3402e;color:#b3402e;
-  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;writing-mode:vertical-rl;
+  display:inline-block;margin-top:18px;padding:10px 12px;border:1px solid rgba(110,200,255,.45);color:#6ec8ff;
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
 }
-.p6 .wave-hud{margin-top:18px;font-family:var(--mono);font-size:11px;opacity:.7;max-width:40ch;line-height:1.8}
+.p6 .wave-hud{margin-top:14px;font-family:var(--mono);font-size:11px;opacity:.65;max-width:42ch;line-height:1.8}
 
 /* Matrix rain */
 .prain{background:#020604;color:#c8ffd9}
@@ -261,11 +288,15 @@ body.has-cursor #cursor{display:block}
   .p2 .grid2{grid-template-columns:1fr;gap:20px}
   .p2 .turbine-wrap{max-height:36vh}
   .frame-index{display:none}
-  .p6 .hanko{display:none}
   .btn{flex:1 1 auto;min-width:min(100%,130px)}
   .p1 .cta-row,.pcmr .cta-row{width:100%}
   .nav .links a{font-size:10px}
   .hud input[type=range]{width:80px}
+  .hero-grid{grid-template-columns:repeat(2,1fr);gap:8px;margin-top:22px}
+  .hero-card{padding:10px 12px;min-height:64px}
+  .hero-card .hc-title{font-size:13px}
+  .p1 .display{font-size:clamp(32px,9vw,56px)}
+  .p1 .lede{display:none}
 }
 </style>
 </head>
@@ -303,32 +334,46 @@ body.has-cursor #cursor{display:block}
       <div class="panel-inner">
         <p class="eyebrow">A showcase of magic · drawn live by math & physics</p>
         <h1 class="display">We boost the productivity of reality.</h1>
-        <p class="lede">No images. No video. Gerstner seas, Kepler disks, flyable rockets, sacred growth, the Matrix — equations running in your hands.</p>
+        <p class="lede">No images. No video. Pick any experiment below — fans, flight, singularities, living gardens, oceans, the Matrix — all running as equations in your browser.</p>
         <div class="cta-row">
           <a class="btn solid" href="#machine">Begin the show</a>
           <a class="btn" href="#comms">transmit →</a>
         </div>
+        <nav class="hero-grid interactive" aria-label="All projects">
+          <a class="hero-card" href="#machine"><span class="hc-num">02</span><span class="hc-title">The Fan</span><span class="hc-tag">turbo · airflow</span></a>
+          <a class="hero-card" href="#launch"><span class="hc-num">03</span><span class="hc-title">Launch</span><span class="hc-tag">fly it yourself</span></a>
+          <a class="hero-card" href="#singularity"><span class="hc-num">04</span><span class="hc-title">Singularity</span><span class="hc-tag">Grok · horizon</span></a>
+          <a class="hero-card" href="#life"><span class="hc-num">05</span><span class="hc-title">Garden</span><span class="hc-tag">life · spirit</span></a>
+          <a class="hero-card" href="#wave"><span class="hc-num">06</span><span class="hc-title">Fourier Sea</span><span class="hc-tag">interference</span></a>
+          <a class="hero-card" href="#matrix"><span class="hc-num">07</span><span class="hc-title">Matrix</span><span class="hc-tag">digital rain</span></a>
+          <a class="hero-card" href="#codecorridor"><span class="hc-num">08</span><span class="hc-title">Corridor</span><span class="hc-tag">code walls</span></a>
+          <a class="hero-card" href="#breath"><span class="hc-num">09</span><span class="hc-title">Breath</span><span class="hc-tag">sacred φ</span></a>
+          <a class="hero-card" href="#cmr"><span class="hc-num">11</span><span class="hc-title">CMR Africa</span><span class="hc-tag">elements</span></a>
+          <a class="hero-card" href="#comms"><span class="hc-num">12</span><span class="hc-title">Comms</span><span class="hc-tag">connect</span></a>
+        </nav>
       </div>
     </div>
   </section>
 
-  <!-- 02 MACHINE -->
-  <section class="panel p2" id="machine" aria-label="Act 02 — The Machine">
+  <!-- 02 MACHINE / FAN -->
+  <section class="panel p2" id="machine" aria-label="Act 02 — The Fan">
     <div class="panel-stage">
-      <div class="panel-tab"><span>Act 02</span><span class="dotline"></span><span>The Machine</span></div>
+      <div class="panel-tab"><span>Act 02</span><span class="dotline"></span><span>The Fan · Turbo Blueprint</span></div>
       <div class="panel-inner">
         <div class="grid2">
           <div>
-            <p class="eyebrow" style="color:var(--blue)">Blueprint · angular momentum</p>
-            <h2 class="display" style="font-size:clamp(30px,5.5vw,72px)">The machine breathes.</h2>
-            <p class="lede">Twelve parametric blades. Air as streamlines under L = r × p. Hover or hold to throttle.</p>
+            <p class="eyebrow" style="color:var(--blue)">Axial fan · dual rotor · live CFD-ish</p>
+            <h2 class="display" style="font-size:clamp(30px,5.5vw,72px)">The fan that thinks in vectors.</h2>
+            <p class="lede">Counter-rotating stages, intake streamlines, wake turbulence, and a live RPM gauge. Hover or hold to spool the core — watch angular momentum rewrite the air.</p>
             <div class="spec">
-              <div><b>blades</b> ....... 12 · swept quads</div>
-              <div><b>airflow</b> ...... intake → swirl → exhaust</div>
-              <div><b>throttle</b> ..... hover / touch</div>
+              <div><b>stage A</b> ...... 9 blades · CW</div>
+              <div><b>stage B</b> ...... 7 blades · CCW</div>
+              <div><b>flow</b> ......... intake → swirl → jet</div>
+              <div><b>control</b> ...... hover / touch throttle</div>
             </div>
+            <p class="fan-hint">tip speed ∝ ωr · hover the disc to max spool</p>
           </div>
-          <div class="turbine-wrap interactive" role="img" aria-label="Interactive turbine">
+          <div class="turbine-wrap interactive" role="img" aria-label="Interactive dual-stage fan">
             <canvas id="turbine" aria-hidden="true"></canvas>
           </div>
         </div>
@@ -391,17 +436,17 @@ body.has-cursor #cursor{display:block}
     </div>
   </section>
 
-  <!-- 06 GREAT WAVE — Gerstner -->
-  <section class="panel p6" id="wave" aria-label="Act 06 — Gerstner Sea">
+  <!-- 06 FOURIER SEA — interference field -->
+  <section class="panel p6" id="wave" aria-label="Act 06 — Fourier Sea">
     <div class="panel-stage">
       <canvas class="art" id="greatwave" aria-hidden="true"></canvas>
-      <div class="panel-tab"><span>Act 06</span><span class="dotline"></span><span>Gerstner Sea · 神奈川</span></div>
+      <div class="panel-tab"><span>Act 06</span><span class="dotline"></span><span>Fourier Sea · Interference</span></div>
       <div class="panel-inner">
-        <p class="eyebrow">Ocean physics · trochoidal waves</p>
-        <h2 class="display">The sea that<br>computes itself.</h2>
-        <p class="lede">True Gerstner waves: water particles orbit in circles; the surface becomes a trochoid. Superimposed trains, foam, wind from your pointer. Fuji watches.</p>
-        <span class="hanko">x′ = x − Σ A ŵ sin θ</span>
-        <p class="wave-hud">Move pointer = local wind · scroll past to feel the swell · after Hokusai, after Stokes</p>
+        <p class="eyebrow">Superposition · live height field</p>
+        <h2 class="display">Waves that<br>write waves.</h2>
+        <p class="lede">Four harmonic sources interfere in real time. Bright crests, dark troughs, caustic glow. Your pointer is a moving source — drag to rewrite the sea.</p>
+        <span class="hanko">η = Σ Aᵢ sin(kᵢ·r − ωᵢt)</span>
+        <p class="wave-hud">pointer = active source · watch nodes & antinodes form</p>
       </div>
     </div>
   </section>
@@ -677,45 +722,137 @@ addEventListener('load', ()=>{ setTimeout(bootEngine, 0); });
   });
 })();
 
-/* ========== 02 TURBINE ========== */
+/* ========== 02 DUAL-STAGE FAN ========== */
 (()=>{
   const cv=document.getElementById('turbine'); if(!cv) return;
-  let rpm=.25, target=.25, angle=0; const air=[]; const AIR_N=Q(260,140,80);
+  let rpm=.2, target=.2, aA=0, aB=0;
+  const air=[]; const AIR_N=Q(320,180,100);
   const wrap=cv.parentElement;
-  wrap.addEventListener('pointerenter',()=>target=3.5,{passive:true});
-  wrap.addEventListener('pointerleave',()=>target=.25,{passive:true});
-  wrap.addEventListener('pointerdown',e=>{ if(e.pointerType!=='mouse') target=3.5; },{passive:true});
-  wrap.addEventListener('pointerup',e=>{ if(e.pointerType!=='mouse') target=.25; },{passive:true});
-  function spawn(w,h){ return {x:-10-Math.random()*40,y:Math.random()*h,vx:1.2+Math.random(),vy:0}; }
-  loop(cv,(ctx,w,h)=>{
-    rpm+=(target-rpm)*.05; angle+=rpm*.02;
+  const setHi=()=>{ target=4.2; };
+  const setLo=()=>{ target=.2; };
+  wrap.addEventListener('pointerenter',setHi,{passive:true});
+  wrap.addEventListener('pointerleave',setLo,{passive:true});
+  wrap.addEventListener('pointerdown',e=>{ if(e.pointerType!=='mouse') setHi(); },{passive:true});
+  wrap.addEventListener('pointerup',e=>{ if(e.pointerType!=='mouse') setLo(); },{passive:true});
+  wrap.addEventListener('pointercancel',setLo,{passive:true});
+
+  function spawn(w,h){
+    /* spawn from left intake arc */
+    const y=h*.15+Math.random()*h*.7;
+    return {x:-20-Math.random()*50, y, vx:1.4+Math.random()*1.2, vy:(Math.random()-.5)*.4, life:1};
+  }
+  function bladePath(ctx,cx,cy,R,a0,inner,outer,sweep,width){
+    ctx.beginPath();
+    for(let s=0;s<=1;s+=.08){
+      const r=inner+s*(outer-inner), sw=a0+s*sweep;
+      const x=cx+Math.cos(sw)*r, y=cy+Math.sin(sw)*r;
+      s?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    }
+    for(let s=1;s>=0;s-=.08){
+      const r=inner+s*(outer-inner), sw=a0+s*sweep+width*(1-s*.4);
+      ctx.lineTo(cx+Math.cos(sw)*r, cy+Math.sin(sw)*r);
+    }
+    ctx.closePath();
+  }
+
+  loop(cv,(ctx,w,h,t)=>{
+    rpm+=(target-rpm)*.06;
+    aA+=rpm*.028;
+    aB-=rpm*.034; /* counter-rotate */
     ctx.clearRect(0,0,w,h);
-    const cx=w/2,cy=h/2,R=Math.min(w,h)*.4, blue='#0000f2';
-    if(!air.length) for(let i=0;i<AIR_N;i++) air.push(Object.assign(spawn(w,h),{x:Math.random()*w}));
-    for(const p of air){
-      const dx=p.x-cx,dy=p.y-cy,d=Math.hypot(dx,dy)||1,suck=Math.max(0,1-d/(R*2.2));
-      p.vx+=suck*.28*(1+rpm*.4); p.vy+=(-dy/d)*suck*.38;
-      if(d<R){ const tang=Math.atan2(dy,dx)+Math.PI/2; p.vx+=Math.cos(tang)*rpm*.55; p.vy+=Math.sin(tang)*rpm*.55; p.vx+=.65+rpm*.4; }
-      p.vx*=.96; p.vy*=.96;
-      const nx=p.x+p.vx, ny=p.y+p.vy, sp=Math.hypot(p.vx,p.vy);
-      ctx.strokeStyle=`rgba(0,0,242,${Math.min(.55,.08+sp*.06)})`;
-      ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(nx,ny); ctx.stroke();
-      p.x=nx; p.y=ny; if(p.x>w+20||p.y<-20||p.y>h+20) Object.assign(p,spawn(w,h));
-    }
-    ctx.strokeStyle=blue; ctx.fillStyle=blue;
-    ctx.lineWidth=1.6; ctx.beginPath(); ctx.arc(cx,cy,R,0,7); ctx.stroke();
-    ctx.lineWidth=.7; ctx.setLineDash([4,6]); ctx.beginPath(); ctx.arc(cx,cy,R*1.12,0,7); ctx.stroke(); ctx.setLineDash([]);
+    const cx=w*.5, cy=h*.5, R=Math.min(w,h)*.38;
+    const blue='#0000f2';
+
+    /* radial grid */
+    ctx.strokeStyle='rgba(0,0,242,.08)'; ctx.lineWidth=1;
+    for(let i=1;i<=4;i++){ ctx.beginPath(); ctx.arc(cx,cy,R*i*.28,0,7); ctx.stroke(); }
+    ctx.beginPath();
     for(let i=0;i<12;i++){
-      const a0=angle+i*(Math.PI*2/12);
-      ctx.beginPath();
-      for(let s=0;s<=1;s+=.1){ const r=R*.22+s*(R*.72),sw=a0+s*.9; const x=cx+Math.cos(sw)*r,y=cy+Math.sin(sw)*r; s?ctx.lineTo(x,y):ctx.moveTo(x,y); }
-      for(let s=1;s>=0;s-=.1){ const r=R*.22+s*(R*.72),sw=a0+s*.9+.16*(1-s*.5); ctx.lineTo(cx+Math.cos(sw)*r,cy+Math.sin(sw)*r); }
-      ctx.closePath(); ctx.lineWidth=1.1; ctx.globalAlpha=.9; ctx.stroke(); ctx.globalAlpha=.06; ctx.fill(); ctx.globalAlpha=1;
+      const a=i*Math.PI/6;
+      ctx.moveTo(cx+Math.cos(a)*R*.15,cy+Math.sin(a)*R*.15);
+      ctx.lineTo(cx+Math.cos(a)*R*1.15,cy+Math.sin(a)*R*1.15);
     }
-    ctx.lineWidth=1.4; ctx.beginPath(); ctx.arc(cx,cy,R*.2,0,7); ctx.stroke();
-    ctx.beginPath(); ctx.arc(cx,cy,R*.07,0,7); ctx.stroke();
-    ctx.font='11px IBM Plex Mono,monospace'; ctx.globalAlpha=.75;
-    ctx.fillText(`${(rpm*1000|0)} rpm`,cx+R*.82,cy-R*1.02);
+    ctx.stroke();
+
+    if(!air.length) for(let i=0;i<AIR_N;i++) air.push(Object.assign(spawn(w,h),{x:Math.random()*w,y:Math.random()*h}));
+
+    /* airflow */
+    for(const p of air){
+      const dx=p.x-cx, dy=p.y-cy, d=Math.hypot(dx,dy)||1;
+      const suck=Math.max(0,1-d/(R*2.4));
+      /* intake toward axis then through */
+      p.vx+=suck*.35*(1.2+rpm*.5);
+      p.vy+=(-dy/d)*suck*.45 + (cy-p.y)*.0008;
+      if(d<R*1.05){
+        const tang=Math.atan2(dy,dx)+Math.PI/2;
+        const spin=rpm*(d<R*.55?-.35:.55);
+        p.vx+=Math.cos(tang)*spin*.7;
+        p.vy+=Math.sin(tang)*spin*.7;
+        p.vx+=.9+rpm*.5; /* jet exhaust rightward */
+      }
+      /* wake turbulence */
+      if(d<R*1.3&&d>R*.4) p.vy+=Math.sin(t*8+p.x*.05)*rpm*.15;
+      p.vx*=.965; p.vy*=.965;
+      const nx=p.x+p.vx, ny=p.y+p.vy;
+      const sp=Math.hypot(p.vx,p.vy);
+      ctx.strokeStyle=`rgba(0,0,242,${Math.min(.6,.06+sp*.07)})`;
+      ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(nx,ny); ctx.stroke();
+      p.x=nx; p.y=ny;
+      if(p.x>w+30||p.y<-30||p.y>h+30||p.x<-40) Object.assign(p,spawn(w,h));
+    }
+
+    /* outer housing */
+    ctx.strokeStyle=blue; ctx.fillStyle=blue;
+    ctx.lineWidth=2; ctx.beginPath(); ctx.arc(cx,cy,R*1.08,0,7); ctx.stroke();
+    ctx.lineWidth=.8; ctx.setLineDash([5,7]);
+    ctx.beginPath(); ctx.arc(cx,cy,R*1.18,0,7); ctx.stroke(); ctx.setLineDash([]);
+
+    /* Stage A — outer 9 blades CW */
+    for(let i=0;i<9;i++){
+      const a0=aA+i*(Math.PI*2/9);
+      bladePath(ctx,cx,cy,R,a0,R*.38,R*.98,.55,.14);
+      ctx.lineWidth=1.15; ctx.globalAlpha=.92; ctx.stroke();
+      ctx.globalAlpha=.07; ctx.fill(); ctx.globalAlpha=1;
+    }
+
+    /* Stage B — inner 7 blades CCW */
+    for(let i=0;i<7;i++){
+      const a0=aB+i*(Math.PI*2/7);
+      bladePath(ctx,cx,cy,R,a0,R*.16,R*.42,-.7,.18);
+      ctx.lineWidth=1.05; ctx.globalAlpha=.85; ctx.stroke();
+      ctx.globalAlpha=.1; ctx.fill(); ctx.globalAlpha=1;
+    }
+
+    /* hub + bolts */
+    ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.arc(cx,cy,R*.14,0,7); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,cy,R*.05,0,7); ctx.fill();
+    for(let i=0;i<6;i++){
+      const a=aA*.3+i*Math.PI/3;
+      ctx.beginPath(); ctx.arc(cx+Math.cos(a)*R*.09, cy+Math.sin(a)*R*.09, 2.2, 0, 7); ctx.stroke();
+    }
+
+    /* intake / exhaust labels */
+    ctx.font='10px IBM Plex Mono,monospace'; ctx.globalAlpha=.55;
+    ctx.fillText('INTAKE →', 12, cy);
+    ctx.fillText('→ JET', w-48, cy);
+    ctx.globalAlpha=1;
+
+    /* RPM dial */
+    const rpmVal=(rpm*920)|0;
+    ctx.font='12px IBM Plex Mono,monospace';
+    ctx.fillStyle=blue; ctx.globalAlpha=.85;
+    ctx.fillText(`${rpmVal} rpm`, cx+R*.78, cy-R*1.05);
+    ctx.fillText(target>1?'SPOOLING':'IDLE', cx+R*.78, cy-R*1.05+16);
+    /* arc gauge */
+    ctx.lineWidth=3; ctx.strokeStyle=`rgba(0,0,242,${.25+rpm*.15})`;
+    ctx.beginPath(); ctx.arc(cx,cy,R*1.22,-Math.PI*.85,-Math.PI*.85+Math.PI*1.5*(rpm/4.2),false); ctx.stroke();
+    ctx.globalAlpha=1;
+
+    /* tip speed note */
+    ctx.font='10px IBM Plex Mono,monospace'; ctx.globalAlpha=.4;
+    ctx.fillText(`tip ~ ${((rpmVal/60)*2*Math.PI*(R/100)|0)} u/s`, 12, h-14);
     ctx.globalAlpha=1;
   });
 })();
@@ -908,13 +1045,13 @@ addEventListener('load', ()=>{ setTimeout(bootEngine, 0); });
     }
     ctx.globalAlpha=1;
 
-    /* Accretion disk — Keplerian, monochrome white with Doppler stretch */
+    /* Accretion disk — slow, heavy Keplerian (Grok-paced) */
     const tilt=.38;
     ctx.globalCompositeOperation='lighter';
     for(const p of disk){
-      /* ω ∝ r^{-3/2} */
-      p.a += 0.42 * Math.pow(RS/p.r, 1.5);
-      p.r -= 0.004;
+      /* ω ∝ r^{-3/2} — slowed ~3.5× for cinematic weight */
+      p.a += 0.12 * Math.pow(RS/p.r, 1.5);
+      p.r -= 0.0012;
       if(p.r < RS*1.2){ p.r = RS*(1.5+Math.random()*5); p.a=Math.random()*Math.PI*2; }
 
       const x=cx+Math.cos(p.a)*p.r;
@@ -938,7 +1075,7 @@ addEventListener('load', ()=>{ setTimeout(bootEngine, 0); });
     }
 
     /* Photon ring — thin luminous circle (Gargantua / Grok logo energy) */
-    const shim=.75+.25*Math.sin(t*1.3);
+    const shim=.78+.18*Math.sin(t*.45);
     ctx.lineWidth=2.2;
     ctx.strokeStyle=`rgba(255,255,255,${.55*shim})`;
     ctx.beginPath(); ctx.ellipse(cx,cy,RS*1.22,RS*1.22*tilt*.15+RS*.15,0,0,Math.PI*2); ctx.stroke();
@@ -1135,121 +1272,136 @@ addEventListener('load', ()=>{ setTimeout(bootEngine, 0); });
   },{onResize:(w,h)=>reset(w,h)});
 })();
 
-/* ========== 06 GERSTNER SEA ========== */
+/* ========== 06 FOURIER SEA — interference height field ========== */
 (()=>{
   const cv=document.getElementById('greatwave');
-  /* Wave trains: amp, wavelength, speed, dir angle, phase */
-  const trains=[
-    {A:.028, L:180, steppiness:.85, dir:0.05, ph:0, col:null},
-    {A:.042, L:140, steppiness:.9, dir:-0.08, ph:1.2, col:null},
-    {A:.055, L:220, steppiness:.95, dir:0.12, ph:2.5, col:null},
-    {A:.022, L:90, steppiness:.7, dir:-0.2, ph:0.7, col:null},
-    {A:.035, L:160, steppiness:.88, dir:0.15, ph:3.1, col:null},
+  /* Fixed sources in unit space; pointer is a 5th live source */
+  const sources=[
+    {x:.18,y:.55, A:1.0, k:.045, w:1.7, ph:0},
+    {x:.82,y:.48, A:.85, k:.038, w:1.4, ph:1.1},
+    {x:.45,y:.78, A:.7,  k:.052, w:2.1, ph:2.4},
+    {x:.60,y:.28, A:.55, k:.03,  w:1.1, ph:.6},
   ];
-  const foam=[];
-
-  function gerstner(x0, z0, t, scale){
-    /* 2D surface in x (horizontal) — z is along view; we use x only for 2D side view
-       Particle: X = x0 - Σ (A * kx/k * sin(θ)), Y = z0 + Σ (A * cos(θ))
-       θ = k·x − ωt + φ,  ω = √(g k)  */
-    let x=x0, y=z0;
-    const g=9.8;
-    for(const W of trains){
-      const k=Math.PI*2/W.L;
-      const omega=Math.sqrt(g*k)*W.steppiness*18; /* scale for visual time */
-      const wind=(MX-.5)*.8;
-      const theta=k*(x0*Math.cos(W.dir)+ (wind*40)) - omega*t + W.ph;
-      const A=W.A*scale*(1+Math.abs(wind)*.3);
-      x -= A * Math.cos(W.dir) * Math.sin(theta) * scale;
-      y += A * Math.cos(theta) * scale;
-    }
-    /* Cursor local gust */
-    const rect=cv.getBoundingClientRect();
-    const lx=MXpx-rect.left;
-    const d=Math.abs(x0-lx);
-    if(d<160){
-      const gust=(1-d/160)*12*Math.sin(t*4+x0*.05);
-      y+=gust; x+=gust*.3*(MX>.5?1:-1);
-    }
-    return {x,y};
-  }
 
   loop(cv,(ctx,w,h,t)=>{
-    const U=Math.min(w,h);
-    /* Sky */
-    const sky=ctx.createLinearGradient(0,0,0,h);
-    sky.addColorStop(0,'#d4c4a0'); sky.addColorStop(.4,'#e9dcbe'); sky.addColorStop(1,'#c9b896');
-    ctx.fillStyle=sky; ctx.fillRect(0,0,w,h);
+    const rect=cv.getBoundingClientRect();
+    const lx=MXpx-rect.left, ly=MYpx-rect.top;
 
-    /* Fuji */
-    const fx=w*.68, fy=h*.42, fw=w*.11;
-    ctx.beginPath();
-    ctx.moveTo(fx-fw,fy); ctx.lineTo(fx,fy-fw*.7); ctx.lineTo(fx+fw,fy);
-    ctx.closePath(); ctx.fillStyle='#5a738c'; ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(fx-fw*.28,fy-fw*.48); ctx.lineTo(fx,fy-fw*.7); ctx.lineTo(fx+fw*.28,fy-fw*.48);
-    ctx.quadraticCurveTo(fx,fy-fw*.38,fx-fw*.28,fy-fw*.48);
-    ctx.fillStyle='#f1e8d3'; ctx.fill();
+    /* Deep ocean night */
+    const bg=ctx.createLinearGradient(0,0,0,h);
+    bg.addColorStop(0,'#040a12'); bg.addColorStop(.5,'#071820'); bg.addColorStop(1,'#0a1e28');
+    ctx.fillStyle=bg; ctx.fillRect(0,0,w,h);
 
-    /* Layered Gerstner surfaces */
-    const bases=[.52,.60,.68,.78,.88];
-    const colors=['#6a92b0','#4a7599','#2f5d82','#1a4060','#0f2a40'];
-    const STEP=QUALITY>=2?5:QUALITY===1?8:12;
+    /* Sample grid — coarse enough to stay fast */
+    const step=QUALITY>=2?7:QUALITY===1?10:14;
+    const cols=Math.ceil(w/step)+1;
+    const rows=Math.ceil(h/step)+1;
 
-    for(let li=0;li<bases.length;li++){
-      const base=h*bases[li];
-      const scale=U*(.9+li*.15);
-      ctx.beginPath();
-      ctx.moveTo(-20,h+20);
-      let prev=null;
-      for(let xi=-20;xi<=w+20;xi+=STEP){
-        const p=gerstner(xi, base, t, scale);
-        /* blend: keep x mostly sequential for fill */
-        const px=xi+(p.x-xi)*.35;
-        const py=p.y;
-        ctx.lineTo(px,py);
-        /* foam at steep crests on top layers */
-        if(li>=2&&prev&&py<prev.y-2.5&&Math.random()>.7){
-          foam.push({x:px,y:py,life:1,vx:(Math.random()-.3)*20,vy:-10-Math.random()*20});
+    /* Precompute height at grid points */
+    const H=new Float32Array(cols*rows);
+    let hMin=1e9, hMax=-1e9;
+    for(let j=0;j<rows;j++){
+      for(let i=0;i<cols;i++){
+        const x=i*step, y=j*step;
+        let eta=0;
+        for(const s of sources){
+          const sx=s.x*w, sy=s.y*h;
+          const dx=x-sx, dy=y-sy;
+          const r=Math.hypot(dx,dy)+1;
+          /* cylindrical spreading ~ 1/√r with soft clamp */
+          const fall=1/Math.sqrt(r*.02+1);
+          eta += s.A * fall * Math.sin(s.k*r - s.w*t + s.ph);
         }
-        prev={x:px,y:py};
+        /* pointer as moving source */
+        const pdx=x-lx, pdy=y-ly, pr=Math.hypot(pdx,pdy)+1;
+        eta += 1.35/Math.sqrt(pr*.025+1) * Math.sin(.055*pr - 2.4*t);
+        H[j*cols+i]=eta;
+        if(eta<hMin) hMin=eta; if(eta>hMax) hMax=eta;
       }
-      ctx.lineTo(w+20,h+20); ctx.closePath();
-      ctx.fillStyle=colors[li]; ctx.fill();
-      /* crest highlight */
-      ctx.strokeStyle=`rgba(241,232,211,${.25+li*.08})`;
-      ctx.lineWidth=1.5; ctx.stroke();
+    }
+    const span=Math.max(0.001, hMax-hMin);
+
+    /* Fill cells with height-mapped color */
+    for(let j=0;j<rows-1;j++){
+      for(let i=0;i<cols-1;i++){
+        const eta=H[j*cols+i];
+        const n=(eta-hMin)/span; /* 0..1 */
+        /* crest = cyan-white, trough = deep blue-black */
+        const rC=(8+n*40)|0;
+        const gC=(20+n*140)|0;
+        const bC=(35+n*200)|0;
+        const a=.55+n*.45;
+        ctx.fillStyle=`rgba(${rC},${gC},${bC},${a})`;
+        ctx.fillRect(i*step, j*step, step+1, step+1);
+      }
     }
 
-    /* Foam particles */
-    for(let i=foam.length-1;i>=0;i--){
-      const f=foam[i];
-      f.x+=f.vx*.016; f.y+=f.vy*.016; f.vy+=40*.016; f.life-=.02;
-      if(f.life<=0||foam.length>400){ foam.splice(i,1); continue; }
-      ctx.fillStyle=`rgba(241,232,211,${f.life*.7})`;
-      ctx.beginPath(); ctx.arc(f.x,f.y,1.5,0,7); ctx.fill();
+    /* Isolines (contours) for math clarity */
+    ctx.lineWidth=1;
+    const levels=[-.6,-.2,.2,.6,.95];
+    for(const lv of levels){
+      const thr=hMin+span*(lv*.5+.5);
+      ctx.strokeStyle=lv>0.5?`rgba(180,240,255,${.2+lv*.25})`:`rgba(60,120,160,${.12})`;
+      ctx.beginPath();
+      for(let j=0;j<rows-1;j++){
+        for(let i=0;i<cols-1;i++){
+          const a=H[j*cols+i], b=H[j*cols+i+1], c=H[(j+1)*cols+i];
+          /* simple edge crossings */
+          if((a-thr)*(b-thr)<0){
+            const t2=(thr-a)/(b-a||1e-6);
+            ctx.moveTo(i*step+t2*step, j*step);
+            ctx.lineTo(i*step+t2*step, j*step+1);
+          }
+          if((a-thr)*(c-thr)<0){
+            const t2=(thr-a)/(c-a||1e-6);
+            ctx.moveTo(i*step, j*step+t2*step);
+            ctx.lineTo(i*step+1, j*step+t2*step);
+          }
+        }
+      }
+      ctx.stroke();
     }
 
-    /* Boat on middle train */
-    const bx=w*.42+Math.sin(t*.1)*w*.15;
-    const bp=gerstner(bx, h*.68, t, U*1.1);
-    const bp2=gerstner(bx+14, h*.68, t, U*1.1);
-    const slope=Math.atan2(bp2.y-bp.y,14);
-    ctx.save(); ctx.translate(bp.x, bp.y-2); ctx.rotate(slope);
-    ctx.fillStyle='#2a2118';
-    ctx.beginPath(); ctx.moveTo(-U*.04,0); ctx.quadraticCurveTo(0,U*.014,U*.045,-U*.005); ctx.quadraticCurveTo(0,U*.004,-U*.04,0); ctx.fill();
-    ctx.strokeStyle='#f1e8d3'; ctx.lineWidth=1;
-    for(let i=-2;i<=2;i++){ ctx.beginPath(); ctx.moveTo(i*U*.01,-1); ctx.lineTo(i*U*.01,-U*.007); ctx.stroke(); }
-    ctx.restore();
+    /* Source markers */
+    ctx.globalCompositeOperation='lighter';
+    for(const s of sources){
+      const sx=s.x*w, sy=s.y*h;
+      const pulse=1+.15*Math.sin(t*s.w);
+      const g=ctx.createRadialGradient(sx,sy,0,sx,sy,28*pulse);
+      g.addColorStop(0,'rgba(140,220,255,.55)');
+      g.addColorStop(1,'rgba(40,100,160,0)');
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(sx,sy,28*pulse,0,7); ctx.fill();
+      ctx.strokeStyle='rgba(180,230,255,.5)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(sx,sy,5,0,7); ctx.stroke();
+    }
+    /* pointer source */
+    if(lx>0&&lx<w&&ly>0&&ly<h){
+      const g=ctx.createRadialGradient(lx,ly,0,lx,ly,40);
+      g.addColorStop(0,'rgba(255,255,255,.45)');
+      g.addColorStop(1,'rgba(100,200,255,0)');
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(lx,ly,40,0,7); ctx.fill();
+      ctx.strokeStyle='rgba(255,255,255,.6)'; ctx.lineWidth=1.2;
+      ctx.beginPath(); ctx.arc(lx,ly,8,0,7); ctx.stroke();
+    }
+    ctx.globalCompositeOperation='source-over';
 
-    /* Math cartouche */
-    const bx2=w-170, by2=58;
-    ctx.fillStyle='rgba(241,232,211,.92)'; ctx.fillRect(bx2,by2,150,52);
-    ctx.strokeStyle='#16344f'; ctx.lineWidth=1.3; ctx.strokeRect(bx2,by2,150,52);
-    ctx.fillStyle='#16344f'; ctx.font='10px IBM Plex Mono,monospace';
-    ctx.fillText('GERSTNER · TROCHOID', bx2+10, by2+18);
-    ctx.fillText('ω = √(g k)  ·  Q'+QUALITY, bx2+10, by2+34);
-    ctx.fillText('wind ← pointer', bx2+10, by2+46);
+    /* Caustic sparkles on crests */
+    ctx.fillStyle='rgba(220,250,255,.5)';
+    for(let n=0;n<Q(40,24,12);n++){
+      const i=(Math.random()*(cols-1))|0, j=(Math.random()*(rows-1))|0;
+      const nrm=(H[j*cols+i]-hMin)/span;
+      if(nrm>.82) ctx.fillRect(i*step, j*step, 2, 2);
+    }
+
+    /* HUD plate */
+    ctx.fillStyle='rgba(4,12,20,.72)';
+    ctx.fillRect(w-178, 52, 162, 58);
+    ctx.strokeStyle='rgba(110,200,255,.4)'; ctx.lineWidth=1;
+    ctx.strokeRect(w-178, 52, 162, 58);
+    ctx.font='10px IBM Plex Mono,monospace'; ctx.fillStyle='rgba(180,220,255,.85)';
+    ctx.fillText('FOURIER SEA', w-166, 70);
+    ctx.fillText('η = Σ A sin(kr − ωt)', w-166, 86);
+    ctx.fillText('5 sources · live', w-166, 100);
   });
 })();
 
