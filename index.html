@@ -119,7 +119,8 @@ body.has-cursor #cursor{display:block}
 }
 /* Stage is the visual layer we scale/dim — not the sticky element */
 .panel-stage{
-  position:absolute;inset:0;
+  position:absolute;left:0;top:0;right:0;bottom:0;
+  width:100%;height:100%;
   transform-origin:center top;
   will-change:transform,filter;
 }
@@ -521,6 +522,7 @@ body.has-cursor #cursor{display:block}
 (function(){
 'use strict';
 
+/* REDUCE only softens chrome — never freezes the showcase */
 const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const NARROW = matchMedia('(max-width:760px)').matches;
 const COARSE = matchMedia('(pointer:coarse)').matches;
@@ -528,31 +530,22 @@ const FINE = matchMedia('(pointer:fine)').matches;
 const SAVE_DATA = !!(navigator.connection && navigator.connection.saveData);
 const LOW = (navigator.hardwareConcurrency||8)<=4 || (navigator.deviceMemory||8)<=4;
 
-/* Quality: 0 eco · 1 balanced · 2 high — width-based, not coarse-only */
-let QUALITY = REDUCE || SAVE_DATA ? 0 : (NARROW || LOW ? 1 : 2);
+/* Quality: 0 eco · 1 balanced · 2 high */
+let QUALITY = SAVE_DATA ? 0 : (NARROW || LOW || REDUCE ? 1 : 2);
 const DPR_CAP = QUALITY===0 ? 1 : QUALITY===1 ? 1.5 : 2;
 let DPR = Math.min(window.devicePixelRatio||1, DPR_CAP);
-let PAGE_VISIBLE = !document.hidden;
 
 let MX=.5, MY=.5, MXpx=innerWidth/2, MYpx=innerHeight/2;
-let _pp=false,_px=MXpx,_py=MYpx;
 function onPtr(e){
-  _px=e.clientX; _py=e.clientY;
-  if(_pp) return;
-  _pp=true;
-  requestAnimationFrame(()=>{
-    _pp=false;
-    MXpx=_px; MYpx=_py;
-    MX=_px/Math.max(1,innerWidth); MY=_py/Math.max(1,innerHeight);
-  });
+  MXpx=e.clientX; MYpx=e.clientY;
+  MX=MXpx/Math.max(1,innerWidth); MY=MYpx/Math.max(1,innerHeight);
 }
 addEventListener('pointermove',onPtr,{passive:true});
 addEventListener('pointerdown',onPtr,{passive:true});
-document.addEventListener('visibilitychange',()=>{ PAGE_VISIBLE=!document.hidden; });
 addEventListener('resize',()=>{ DPR=Math.min(devicePixelRatio||1,DPR_CAP); },{passive:true});
 
-/* Desktop custom cursor only when fine pointer + not reduced motion */
-if(FINE && !COARSE && !REDUCE){
+/* Desktop custom cursor when fine pointer */
+if(FINE && !COARSE){
   document.body.classList.add('has-cursor');
 }
 
@@ -566,7 +559,7 @@ function noise2(x,y){
 function fbm(x,y){ return noise2(x,y)*.6+noise2(x*2.1,y*2.1)*.3+noise2(x*4.3,y*4.3)*.1; }
 function Q(hi,mid,lo){ return QUALITY>=2?hi:QUALITY===1?mid:lo; }
 
-/* ---- BOOT ---- */
+/* ---- BOOT (never blocks forever) ---- */
 (()=>{
   const boot=document.getElementById('boot'), lines=document.getElementById('bootLines');
   if(!boot) return;
@@ -582,11 +575,10 @@ function Q(hi,mid,lo){ return QUALITY>=2?hi:QUALITY===1?mid:lo; }
   let i=0;
   const iv=setInterval(()=>{
     const d=document.createElement('div'); d.textContent=script[i]; lines.appendChild(d);
-    if(++i>=script.length){ clearInterval(iv); setTimeout(()=>boot.classList.add('done'),320); }
-  },150);
+    if(++i>=script.length){ clearInterval(iv); setTimeout(()=>boot.classList.add('done'),280); }
+  },120);
   boot.addEventListener('click',()=>boot.classList.add('done'));
-  /* Failsafe: never trap the page under boot */
-  setTimeout(()=>boot.classList.add('done'),4000);
+  setTimeout(()=>boot.classList.add('done'),2500);
 })();
 
 /* ---- CURSOR ---- */
@@ -596,7 +588,7 @@ function Q(hi,mid,lo){ return QUALITY>=2?hi:QUALITY===1?mid:lo; }
   if(!c) return;
   let x=innerWidth/2,y=innerHeight/2;
   (function tick(){
-    if(PAGE_VISIBLE){
+    if(!document.hidden){
       x+=(MXpx-x)*.22; y+=(MYpx-y)*.22;
       c.style.transform=`translate3d(${x-13}px,${y-13}px,0)`;
     }
@@ -607,98 +599,116 @@ function Q(hi,mid,lo){ return QUALITY>=2?hi:QUALITY===1?mid:lo; }
   },{passive:true});
 })();
 
-/* ---- CANVAS LOOP (desktop-safe) ---- */
+/* ============================================================
+   GLOBAL ANIMATION ENGINE
+   One rAF clock drives every scene. Visibility is a cheap
+   getBoundingClientRect cull — no IntersectionObserver races,
+   no dual-observe stop bugs, no REDUCE freeze.
+   ============================================================ */
+const SCENES=[];
+
 function loop(canvas, draw, opts){
   opts=opts||{};
   if(!canvas) return;
-  /* Plain 2d context — desynchronized breaks some desktop GPUs */
-  const ctx=canvas.getContext('2d',{alpha:opts.alpha!==false});
-  if(!ctx) return;
-
-  let w=0,h=0,raf=null,visible=false,t=0,last=0,frameN=0;
-  const every=opts.every!=null?opts.every:(QUALITY===0?2:1);
-
-  function measure(){
-    /* Prefer parent box — absolute canvas can report 0 before layout */
-    const parent=canvas.parentElement;
-    const br=parent?parent.getBoundingClientRect():canvas.getBoundingClientRect();
-    let cw=Math.max(1,Math.round(br.width));
-    let ch=Math.max(1,Math.round(br.height));
-    /* Fallback to viewport if still tiny (sticky pre-layout) */
-    if(cw<2) cw=Math.max(1,innerWidth);
-    if(ch<2) ch=Math.max(1,innerHeight);
-    return {cw,ch};
-  }
-
-  function size(){
-    const {cw,ch}=measure();
-    const bw=(cw*DPR)|0, bh=(ch*DPR)|0;
-    if(cw===w && ch===h && canvas.width===bw && canvas.height===bh) return;
-    w=cw; h=ch;
-    canvas.width=bw; canvas.height=bh;
-    /* CSS size locked by stylesheet; also set inline as belt-and-suspenders */
-    canvas.style.width=cw+'px';
-    canvas.style.height=ch+'px';
-    ctx.setTransform(DPR,0,0,DPR,0,0);
-    if(opts.onResize) opts.onResize(w,h);
-  }
-
-  function frame(now){
-    if(!visible||!PAGE_VISIBLE||REDUCE){ raf=null; return; }
-    const dt=last?Math.min(0.05,(now-last)/1000):1/60;
-    last=now;
-    frameN++;
-    if(every>1 && (frameN%every)){
-      t+=dt;
-      raf=requestAnimationFrame(frame);
-      return;
-    }
-    if(w<2||h<2) size();
-    try{ draw(ctx,w,h,t,dt); }catch(err){ /* keep loop alive */ }
-    t+=dt*every;
-    raf=requestAnimationFrame(frame);
-  }
-  function start(){
-    if(raf!=null) return;
-    last=0;
-    size();
-    raf=requestAnimationFrame(frame);
-  }
-  function stop(){
-    if(raf!=null){ cancelAnimationFrame(raf); raf=null; }
-  }
-
-  const io=new IntersectionObserver((entries)=>{
-    const e=entries[0];
-    visible=!!(e&&e.isIntersecting);
-    if(visible) start();
-    else stop();
-  },{threshold:0, rootMargin:'12% 0px'});
-  io.observe(canvas);
-  /* Also observe the panel so sticky cards re-trigger reliably */
-  const panel=canvas.closest('.panel');
-  if(panel) io.observe(panel);
-
-  document.addEventListener('visibilitychange',()=>{
-    if(PAGE_VISIBLE&&visible) start();
-    else if(!PAGE_VISIBLE) stop();
-  });
-
-  let rt=null;
-  addEventListener('resize',()=>{
-    clearTimeout(rt);
-    rt=setTimeout(()=>{ if(visible) size(); },100);
-  },{passive:true});
-
-  /* Initial paint after layout */
-  requestAnimationFrame(()=>{
-    size();
-    try{ draw(ctx,w,h,0,0); }catch(_){}
-    /* Force-start first panel even if IO is late */
-    const r=canvas.getBoundingClientRect();
-    if(r.bottom>0 && r.top<innerHeight){ visible=true; start(); }
+  const ctx=canvas.getContext('2d');
+  if(!ctx){ console.error('[JDE] no 2d context', canvas.id); return; }
+  /* sizeHost = paint box; cullHost = sticky panel for on-screen tests */
+  const sizeHost = canvas.parentElement || canvas;
+  const cullHost = canvas.closest('.panel') || sizeHost;
+  SCENES.push({
+    canvas, ctx, draw, opts, sizeHost, cullHost,
+    w:0, h:0, t:0, frameN:0,
+    every: opts.every!=null ? opts.every : (QUALITY===0 ? 2 : 1)
   });
 }
+
+function resizeScene(s){
+  const br=s.sizeHost.getBoundingClientRect();
+  let cw=Math.round(br.width);
+  let ch=Math.round(br.height);
+  /* Fallback: panel box, then viewport — never stay 0×0 */
+  if(cw<2 || ch<2){
+    const pr=s.cullHost.getBoundingClientRect();
+    if(cw<2) cw=Math.round(pr.width);
+    if(ch<2) ch=Math.round(pr.height);
+  }
+  if(cw<2) cw=innerWidth||800;
+  if(ch<2) ch=innerHeight||600;
+  const bw=Math.max(1,(cw*DPR)|0);
+  const bh=Math.max(1,(ch*DPR)|0);
+  if(s.w===cw && s.h===ch && s.canvas.width===bw && s.canvas.height===bh) return false;
+  s.w=cw; s.h=ch;
+  s.canvas.width=bw;
+  s.canvas.height=bh;
+  s.ctx.setTransform(DPR,0,0,DPR,0,0);
+  if(s.opts.onResize){
+    try{ s.opts.onResize(cw,ch); }catch(e){ console.error('[JDE] onResize', s.canvas.id, e); }
+  }
+  return true;
+}
+
+let _lastEngine=0;
+let _engineStarted=false;
+function engine(now){
+  requestAnimationFrame(engine);
+  if(document.hidden) return;
+
+  const dt=_lastEngine ? Math.min(0.05,(now-_lastEngine)/1000) : 1/60;
+  _lastEngine=now;
+  const vh=innerHeight||800;
+  const margin=160;
+
+  for(let i=0;i<SCENES.length;i++){
+    const s=SCENES[i];
+    const r=s.cullHost.getBoundingClientRect();
+    /* Sticky stack: many panels share the viewport — draw if overlapping */
+    if(r.bottom < -margin || r.top > vh+margin) continue;
+
+    s.frameN++;
+    if(s.every>1 && (s.frameN % s.every)){
+      s.t+=dt;
+      continue;
+    }
+
+    resizeScene(s);
+    if(s.w<2||s.h<2) continue;
+
+    try{
+      s.draw(s.ctx, s.w, s.h, s.t, dt);
+    }catch(err){
+      console.error('[JDE] draw failed', s.canvas.id, err);
+    }
+    s.t += dt * s.every;
+  }
+}
+
+function bootEngine(){
+  if(_engineStarted) return;
+  _engineStarted=true;
+  console.info('[JDE] engine start · scenes=', SCENES.length);
+  for(let i=0;i<SCENES.length;i++){
+    try{
+      resizeScene(SCENES[i]);
+      const s=SCENES[i];
+      if(s.w>0&&s.h>0) s.draw(s.ctx, s.w, s.h, 0, 0);
+    }catch(err){
+      console.error('[JDE] first paint', SCENES[i].canvas&&SCENES[i].canvas.id, err);
+    }
+  }
+  requestAnimationFrame(engine);
+}
+
+/* Start after ALL scene registrations in this file have run */
+addEventListener('DOMContentLoaded', bootEngine);
+/* file is parsed at end of body — DOM is ready; also start immediately */
+if(document.readyState!=='loading'){
+  /* Defer one macrotask so every loop() below this point has registered */
+  setTimeout(bootEngine, 0);
+}
+
+addEventListener('resize',()=>{
+  for(let i=0;i<SCENES.length;i++) resizeScene(SCENES[i]);
+},{passive:true});
 
 /* ============================================================
    ACT 01 — ASCII FLUID (advection + heat diffusion)
