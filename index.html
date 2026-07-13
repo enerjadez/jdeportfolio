@@ -5,15 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0a0a10">
 <meta name="color-scheme" content="dark">
-<meta name="description" content="JDE Portfolio — a live math-driven showcase. No images, no video: parametric engines, fluid fields, and physics drawn in real time on canvas.">
+<meta name="description" content="JDE Portfolio — live math & physics showcase. Engines, fields, waves, and creative market art drawn in real time.">
 <meta name="author" content="Jade">
 <meta property="og:title" content="JDE Portfolio — drawn live by math">
-<meta property="og:description" content="A showcase of magic. Systems wired to the source of all flow — everything below is drawn live by equations.">
+<meta property="og:description" content="A showcase of magic. Parametric engines, fluid fields, singularities, and the elements of creative insight.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://enerjadez.github.io/jdeportfolio/">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="JDE Portfolio — drawn live by math">
-<meta name="twitter:description" content="A live math-driven portfolio showcase. Engines, waves, singularities — all drawn in your browser.">
 <title>JDE Portfolio — drawn live by math</title>
 <link rel="canonical" href="https://enerjadez.github.io/jdeportfolio/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230000f2'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-family='system-ui' font-size='14' font-weight='700'%3EJ%3C/text%3E%3C/svg%3E">
@@ -21,14 +18,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-/* ============================================================
-   TOKENS
-   ============================================================ */
 :root{
   --blue:#0000f2; --blue-deep:#0000a8;
   --paper:#f2f0e9; --ink:#0a0a10;
   --flame:#ff7a1a; --gold:#e8b44a;
   --jp-sky:#e9dcbe; --jp-blue:#16344f; --jp-cream:#f1e8d3;
+  --cmr-earth:#c45c26; --cmr-fire:#e85d04; --cmr-water:#1d4e89;
+  --cmr-air:#f4d35e; --cmr-aether:#f8f1e3; --cmr-night:#1a0f0a;
   --line:rgba(16,16,20,.18); --line-blue:rgba(255,255,255,.22);
   --mono:'IBM Plex Mono',ui-monospace,monospace;
   --sans:'Space Grotesk',system-ui,sans-serif;
@@ -39,110 +35,113 @@
   --safe-left:env(safe-area-inset-left,0px);
   --safe-right:env(safe-area-inset-right,0px);
 }
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{
   background:var(--ink);color:var(--ink);font-family:var(--sans);
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
-  cursor:none;overflow-x:clip;min-height:100dvh;
+  overflow-x:hidden;min-height:100vh;min-height:100dvh;
   padding-left:var(--safe-left);padding-right:var(--safe-right);
-  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
 }
-@media (pointer:coarse){body{cursor:auto}}
+body.has-cursor{cursor:none}
+body.has-cursor a,body.has-cursor button{cursor:none}
 ::selection{background:var(--blue);color:#fff}
-a{color:inherit;text-decoration:none;cursor:none}
-@media (pointer:coarse){a{cursor:auto}}
-img,canvas{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+/* Never max-width canvas — bitmap CSS scale breaks absolute fill */
+canvas{display:block}
+
 .skip-link{
   position:absolute;left:-9999px;top:0;z-index:10000;
   background:#fff;color:var(--blue);padding:12px 18px;font-family:var(--mono);font-size:13px;
 }
-.skip-link:focus{left:var(--gutter);top:calc(var(--safe-top) + 12px)}
+.skip-link:focus{left:var(--gutter);top:calc(var(--safe-top)+12px)}
 
-/* ============================================================
-   BOOT SEQUENCE
-   ============================================================ */
+/* BOOT */
 #boot{
   position:fixed;inset:0;z-index:999;background:var(--ink);color:#7ef29a;
   font-family:var(--mono);font-size:13px;line-height:2;
-  padding:calc(var(--gutter) + 20px);
-  transition:opacity .5s, visibility .5s;
+  padding:calc(var(--gutter)+20px);
+  transition:opacity .45s,visibility .45s;
 }
-#boot.done{opacity:0;visibility:hidden}
+#boot.done{opacity:0;visibility:hidden;pointer-events:none}
 #boot .cur{display:inline-block;width:8px;height:15px;background:#7ef29a;vertical-align:-2px;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
 
-/* ============================================================
-   CUSTOM CURSOR
-   ============================================================ */
+/* CURSOR */
 #cursor{
   position:fixed;z-index:998;pointer-events:none;
   width:26px;height:26px;left:0;top:0;
   mix-blend-mode:difference;color:#fff;
-  will-change:transform;
+  will-change:transform;display:none;
 }
+body.has-cursor #cursor{display:block}
 #cursor::before,#cursor::after{content:"";position:absolute;background:#fff;transition:transform .12s ease-out}
 #cursor::before{left:12px;top:0;width:2px;height:26px}
 #cursor::after{top:12px;left:0;height:2px;width:26px}
 #cursor.hot::before,#cursor.hot::after{transform:rotate(45deg) scale(1.35)}
-@media (pointer:coarse){#cursor{display:none}}
 
-/* ============================================================
-   CHROME
-   ============================================================ */
+/* CHROME — fixed overlay; never intercepts scroll (pointer-events none) */
 .chrome{position:fixed;inset:0;z-index:50;pointer-events:none;font-family:var(--mono);font-size:11px;letter-spacing:.08em}
 .nav{
   pointer-events:auto;position:absolute;top:0;left:0;right:0;
   display:flex;justify-content:space-between;align-items:center;gap:12px;
-  padding:calc(12px + var(--safe-top)) max(var(--gutter), var(--safe-right)) 12px max(var(--gutter), var(--safe-left));
+  padding:calc(12px + var(--safe-top)) max(var(--gutter),var(--safe-right)) 12px max(var(--gutter),var(--safe-left));
   mix-blend-mode:difference;color:#fff;
 }
 .nav .brand{font-weight:600;text-transform:uppercase;flex-shrink:0}
 .nav .links{display:flex;gap:clamp(12px,3vw,22px);flex-wrap:wrap;justify-content:flex-end}
 .nav .links a{
   opacity:.75;transition:opacity .2s;
-  min-height:44px;display:inline-flex;align-items:center;
-  padding:4px 2px;
+  min-height:44px;display:inline-flex;align-items:center;padding:4px 2px;
 }
 .nav .links a:hover,.nav .links a:focus-visible{opacity:1}
 .nav a:focus-visible{outline:1px dashed currentColor;outline-offset:4px}
-#scrollbar{position:absolute;top:0;left:0;height:2px;background:#fff;mix-blend-mode:difference;width:0;will-change:width}
+#scrollbar{position:absolute;top:0;left:0;height:2px;background:#fff;mix-blend-mode:difference;width:0}
 .frame-index{
-  position:absolute;right:max(var(--gutter), var(--safe-right));top:50%;transform:translateY(-50%);
+  position:absolute;right:max(var(--gutter),var(--safe-right));top:50%;transform:translateY(-50%);
   display:flex;flex-direction:column;gap:9px;mix-blend-mode:difference;color:#fff;
 }
 .frame-index span{opacity:.35;transition:opacity .25s}
 .frame-index span.on{opacity:1}
 
-/* ============================================================
-   CARD STACK
-   ============================================================ */
-.stack{position:relative;isolation:isolate}
+/* CARD STACK — sticky on the SECTION only; NEVER transform the sticky node */
+.stack{position:relative}
 .panel{
-  position:sticky;top:0;height:100svh;height:100dvh;min-height:min(100svh, 100dvh);overflow:hidden;
+  position:sticky;top:0;
+  height:100vh;height:100dvh;
+  min-height:560px;
+  overflow:hidden;
   border-radius:var(--card-radius) var(--card-radius) 0 0;
-  transform-origin:center top;
   display:flex;flex-direction:column;
-  contain:layout style paint;
+  /* Do NOT use contain:paint — it breaks sticky stacking on desktop */
 }
-.panel.is-active{will-change:transform,filter}
+/* Stage is the visual layer we scale/dim — not the sticky element */
+.panel-stage{
+  position:absolute;inset:0;
+  transform-origin:center top;
+  will-change:transform,filter;
+}
 .panel-inner{
   flex:1;display:flex;flex-direction:column;justify-content:center;
-  padding:calc(var(--gutter) + 48px) var(--gutter) calc(var(--gutter) + var(--safe-bottom));
-  position:relative;z-index:2;
-  max-width:100%;
+  padding:calc(var(--gutter)+52px) var(--gutter) calc(var(--gutter)+var(--safe-bottom));
+  position:relative;z-index:2;max-width:100%;pointer-events:none;
 }
+.panel-inner a,.panel-inner button,.panel-inner .interactive{pointer-events:auto}
 .panel-tab{
   position:absolute;top:0;left:0;right:0;z-index:3;
   display:flex;justify-content:space-between;align-items:center;
   padding:14px var(--gutter);
   font-family:var(--mono);font-size:clamp(10px,2.5vw,11px);letter-spacing:.12em;text-transform:uppercase;
-  border-bottom:1px solid var(--line);
-  pointer-events:none;
+  border-bottom:1px solid var(--line);pointer-events:none;
 }
 .panel-tab .dotline{flex:1;margin:0 18px;border-top:1px dashed currentColor;opacity:.25}
-.art{position:absolute;inset:0;z-index:1;width:100%;height:100%;touch-action:none}
+.art{
+  position:absolute;inset:0;z-index:1;
+  width:100%!important;height:100%!important;
+  max-width:none!important;max-height:none!important;
+}
 
 .eyebrow{font-family:var(--mono);font-size:clamp(10px,2.8vw,12px);letter-spacing:.18em;text-transform:uppercase;opacity:.65;margin-bottom:18px}
 .display{font-weight:700;line-height:.94;letter-spacing:-.02em;font-size:clamp(36px,9vw,128px);text-wrap:balance}
@@ -156,20 +155,19 @@ img,canvas{max-width:100%;display:block}
 .btn{
   font-family:var(--mono);font-size:13px;letter-spacing:.06em;
   padding:14px 22px;border-radius:8px;border:1px solid rgba(255,255,255,.5);
-  color:#fff;background:transparent;transition:transform .2s, background .2s, border-color .2s;
+  color:#fff;background:transparent;transition:transform .2s,background .2s;
   min-height:48px;display:inline-flex;align-items:center;justify-content:center;
-  -webkit-user-select:none;user-select:none;
+  user-select:none;
 }
 .btn.solid{background:#fff;color:var(--blue);border-color:#fff}
 .btn:hover{transform:translateY(-2px)}
-.btn:active{transform:translateY(0)}
 .btn:focus-visible{outline:2px solid #fff;outline-offset:3px}
 .p1 .panel-tab{border-color:var(--line-blue)}
 
 /* 02 machine */
 .p2{background:var(--paper)}
-.p2::before{
-  content:"";position:absolute;inset:0;z-index:0;
+.p2 .panel-stage::before{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
   background:
     linear-gradient(var(--line) 1px,transparent 1px) 0 0/100% 72px,
     linear-gradient(90deg,var(--line) 1px,transparent 1px) 0 0/72px 100%;
@@ -178,8 +176,8 @@ img,canvas{max-width:100%;display:block}
 .p2 .grid2{display:grid;grid-template-columns:1fr 1.1fr;gap:40px;align-items:center}
 .p2 .spec{font-family:var(--mono);font-size:13px;line-height:2.1;border-left:2px solid var(--blue);padding-left:22px;margin-top:26px}
 .p2 .spec b{color:var(--blue)}
-.p2 .turbine-wrap{position:relative;aspect-ratio:1.15;max-height:66svh}
-.p2 canvas{position:absolute;inset:0;width:100%;height:100%}
+.p2 .turbine-wrap{position:relative;aspect-ratio:1.15;max-height:66vh;max-height:66dvh;width:100%}
+.p2 .turbine-wrap canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
 
 /* 03 launch */
 .p3{background:#07070f;color:var(--paper)}
@@ -191,7 +189,7 @@ img,canvas{max-width:100%;display:block}
 .p4 .panel-tab{border-color:rgba(255,255,255,.14)}
 .p4 .panel-inner{justify-content:flex-end}
 .skill-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;font-family:var(--mono);font-size:12px}
-.skill-chips span{border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:8px 16px;backdrop-filter:blur(4px);background:rgba(0,0,0,.3);transition:.2s}
+.skill-chips span{border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:8px 16px;background:rgba(0,0,0,.3);transition:.2s}
 .skill-chips span:hover{border-color:#fff;background:rgba(0,0,242,.35)}
 
 /* 05 source */
@@ -204,7 +202,7 @@ img,canvas{max-width:100%;display:block}
 /* 06 great wave */
 .p6{background:var(--jp-sky);color:var(--jp-blue)}
 .p6 .panel-tab{border-color:rgba(22,52,79,.3)}
-.p6 .panel-inner{justify-content:flex-start;padding-top:calc(var(--gutter) + 64px)}
+.p6 .panel-inner{justify-content:flex-start;padding-top:calc(var(--gutter)+64px)}
 .p6 .display{font-size:clamp(34px,6vw,86px);color:var(--jp-blue)}
 .p6 .eyebrow{color:var(--jp-blue)}
 .p6 .hanko{
@@ -214,14 +212,14 @@ img,canvas{max-width:100%;display:block}
   writing-mode:vertical-rl;
 }
 
-/* 07 the rain — digital glyph rain */
+/* 07 rain */
 .prain{background:#020604;color:#c8ffd9}
 .prain .panel-tab{border-color:rgba(200,255,217,.15)}
 .prain .display{font-size:clamp(34px,6vw,84px);text-shadow:0 0 30px rgba(60,255,140,.25)}
 .prain .eyebrow{color:#3cff8c}
-.prain .panel-inner{justify-content:flex-end;pointer-events:none}
+.prain .panel-inner{justify-content:flex-end}
 
-/* 08 the observer — the page watches back */
+/* 08 observer */
 .peye{background:var(--paper)}
 .peye .display{font-size:clamp(34px,5.5vw,76px)}
 .peye .telemetry{
@@ -230,7 +228,32 @@ img,canvas{max-width:100%;display:block}
 }
 .peye .telemetry b{color:var(--blue)}
 
-/* 09 constellation */
+/* 09 CMR AFRICA — elements of creative insight */
+.pcmr{background:var(--cmr-night);color:var(--cmr-aether)}
+.pcmr .panel-tab{border-color:rgba(248,241,227,.18);color:var(--cmr-aether)}
+.pcmr .display{font-size:clamp(32px,5.8vw,78px)}
+.pcmr .eyebrow{color:var(--cmr-air);opacity:.95}
+.pcmr .lede{max-width:48ch}
+.pcmr .element-row{
+  display:flex;flex-wrap:wrap;gap:10px;margin-top:28px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+}
+.pcmr .element-row span{
+  padding:8px 14px;border-radius:999px;border:1px solid rgba(248,241,227,.28);
+  display:inline-flex;align-items:center;gap:8px;
+}
+.pcmr .element-row i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.pcmr .element-row .e-earth i{background:var(--cmr-earth)}
+.pcmr .element-row .e-fire i{background:var(--cmr-fire)}
+.pcmr .element-row .e-water i{background:var(--cmr-water)}
+.pcmr .element-row .e-air i{background:var(--cmr-air)}
+.pcmr .element-row .e-aether i{background:var(--cmr-aether)}
+.pcmr .cta-row{display:flex;gap:12px;margin-top:32px;flex-wrap:wrap}
+.pcmr .btn{border-color:rgba(248,241,227,.45);color:var(--cmr-aether)}
+.pcmr .btn.solid{background:var(--cmr-air);color:var(--cmr-night);border-color:var(--cmr-air)}
+.pcmr .btn:focus-visible{outline-color:var(--cmr-air)}
+
+/* 10 constellation */
 .p7{background:var(--paper)}
 .p7 .display a{border-bottom:4px solid var(--blue);transition:.2s}
 .p7 .display a:hover{color:var(--blue)}
@@ -241,52 +264,36 @@ img,canvas{max-width:100%;display:block}
 }
 .p7 .socials a:hover,.p7 .socials a:focus-visible{color:var(--blue);border-color:var(--blue)}
 
-/* 08 signal */
+/* 11 signal */
 .p8{background:#05050c;color:#fff}
-.p8 .panel-inner{justify-content:flex-end;pointer-events:none}
+.p8 .panel-inner{justify-content:flex-end}
 .p8 .display{font-size:clamp(34px,6vw,84px)}
 .p8 .panel-tab{border-color:rgba(255,255,255,.15)}
 
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
   #boot{display:none}
-  .panel{will-change:auto;transform:none!important;filter:none!important}
+  .panel-stage{transform:none!important;filter:none!important;will-change:auto}
 }
-/* Phones & small tablets */
 @media (max-width:760px){
-  .panel{
-    min-height:100svh;min-height:100dvh;
-    border-radius:16px 16px 0 0;
-  }
-  .panel-inner{padding-top:calc(var(--gutter) + 56px)}
+  .panel{min-height:100vh;min-height:100dvh;border-radius:16px 16px 0 0}
+  .panel-inner{padding-top:calc(var(--gutter)+56px)}
   .p2 .grid2{grid-template-columns:1fr;gap:20px}
-  .p2 .turbine-wrap{max-height:38svh;max-height:38dvh;width:100%}
+  .p2 .turbine-wrap{max-height:38vh;max-height:38dvh}
   .p2 .spec{font-size:12px;line-height:1.9;margin-top:18px}
   .frame-index{display:none}
   .p6 .hanko{display:none}
-  .p6 .panel-inner{padding-top:calc(var(--gutter) + 56px)}
-  .p1 .lede,.p3 .lede,.p5 .lede{max-width:100%}
-  .skill-chips{gap:8px}
   .skill-chips span{padding:8px 12px;font-size:11px}
-  .peye .telemetry{font-size:11.5px;line-height:1.9}
   .btn{flex:1 1 auto;min-width:min(100%,140px)}
-  .p1 .cta-row{width:100%}
-  .nav .links{gap:10px}
-  .nav .links a{font-size:10px;letter-spacing:.06em;min-height:40px}
+  .p1 .cta-row,.pcmr .cta-row{width:100%}
+  .nav .links a{font-size:10px;letter-spacing:.06em}
+  .pcmr .element-row{gap:8px}
+  .pcmr .element-row span{padding:7px 10px;font-size:10px}
 }
-/* Short landscape phones */
 @media (max-height:520px) and (orientation:landscape){
-  .panel{min-height:100svh}
   .display{font-size:clamp(28px,7vw,56px)!important}
-  .panel-inner{padding-top:calc(var(--gutter) + 36px);justify-content:center}
-  .p2 .turbine-wrap{max-height:70svh}
   .lede{margin-top:12px;font-size:14px}
   .cta-row{margin-top:16px!important}
-}
-/* Large touch tablets */
-@media (min-width:761px) and (max-width:1024px) and (pointer:coarse){
-  .frame-index{display:none}
-  .p2 .grid2{gap:28px}
 }
 </style>
 </head>
@@ -302,151 +309,200 @@ img,canvas{max-width:100%;display:block}
     <a class="brand" href="#">JDE · Portfolio</a>
     <span class="links">
       <a href="#machine">Machine</a>
-      <a href="#launch">Launch</a>
+      <a href="#cmr">CMR</a>
       <a href="#comms">Comms</a>
     </span>
   </nav>
   <div class="frame-index" id="frameIndex" aria-hidden="true">
-    <span>01</span><span>02</span><span>03</span><span>04</span><span>05</span><span>06</span><span>07</span><span>08</span><span>09</span><span>~~</span>
+    <span>01</span><span>02</span><span>03</span><span>04</span><span>05</span>
+    <span>06</span><span>07</span><span>08</span><span>09</span><span>10</span><span>~~</span>
   </div>
 </div>
 
 <main class="stack" id="main">
 
-  <!-- 01 IGNITION — ascii fluid -->
+  <!-- 01 IGNITION -->
   <section class="panel p1" aria-label="Act 01 — Ignition">
-    <canvas class="art" id="asciiFluid" aria-hidden="true"></canvas>
-    <div class="panel-tab"><span>Act 01</span><span class="dotline"></span><span>Ignition</span></div>
-    <div class="panel-inner">
-      <p class="eyebrow">A showcase of magic · everything below is drawn live by math</p>
-      <h1 class="display">We boost the productivity of reality.</h1>
-      <p class="lede">Systems for individuals and businesses, wired to the source of all flow and life. No images. No video. Just equations, running right now, in your hand. Move your cursor — or your finger — through the glyphs.</p>
-      <div class="cta-row">
-        <a class="btn solid" href="#machine">Begin the show</a>
-        <a class="btn" href="#comms">/-_=+|&lt; transmit -/=</a>
+    <div class="panel-stage">
+      <canvas class="art" id="asciiFluid" aria-hidden="true"></canvas>
+      <div class="panel-tab"><span>Act 01</span><span class="dotline"></span><span>Ignition</span></div>
+      <div class="panel-inner">
+        <p class="eyebrow">A showcase of magic · everything below is drawn live by math</p>
+        <h1 class="display">We boost the productivity of reality.</h1>
+        <p class="lede">Systems for individuals and businesses, wired to the source of all flow and life. No images. No video. Just equations — Navier–Stokes heat, Kepler orbits, Fourier waves — running right now. Move through the glyphs.</p>
+        <div class="cta-row">
+          <a class="btn solid" href="#machine">Begin the show</a>
+          <a class="btn" href="#comms">/-_=+|&lt; transmit -/=</a>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- 02 THE MACHINE — turbine + airflow -->
+  <!-- 02 MACHINE -->
   <section class="panel p2" id="machine" aria-label="Act 02 — The Machine">
-    <div class="panel-tab"><span>Act 02</span><span class="dotline"></span><span>The Machine</span></div>
-    <div class="panel-inner">
-      <div class="grid2">
-        <div>
-          <p class="eyebrow" style="color:var(--blue)">Blueprint · live geometry</p>
-          <h2 class="display" style="font-size:clamp(32px,6vw,80px)">The machine breathes.</h2>
-          <p class="lede">Twelve parametric blades, a bolt circle, dimension lines — and the air itself, drawn as streamlines being swallowed and thrown. Hover or touch the turbine to throttle up and watch the flow bend.</p>
-          <div class="spec">
-            <div><b>blades</b> ....... 12 · swept quads</div>
-            <div><b>airflow</b> ...... adaptive streamlines</div>
-            <div><b>throttle</b> ..... hover / touch · idle 250 rpm</div>
-            <div><b>render</b> ....... canvas 2d · adaptive fps</div>
+    <div class="panel-stage">
+      <div class="panel-tab"><span>Act 02</span><span class="dotline"></span><span>The Machine</span></div>
+      <div class="panel-inner">
+        <div class="grid2">
+          <div>
+            <p class="eyebrow" style="color:var(--blue)">Blueprint · live geometry</p>
+            <h2 class="display" style="font-size:clamp(32px,6vw,80px)">The machine breathes.</h2>
+            <p class="lede">Twelve parametric blades, a bolt circle, dimension lines — and air as streamlines under angular momentum. Hover or touch the turbine to throttle up; watch intake, swirl, and exhaust.</p>
+            <div class="spec">
+              <div><b>blades</b> ....... 12 · swept quads</div>
+              <div><b>airflow</b> ...... L = r × p streamlines</div>
+              <div><b>throttle</b> ..... hover / touch · idle 250 rpm</div>
+              <div><b>render</b> ....... canvas 2d · adaptive fps</div>
+            </div>
+          </div>
+          <div class="turbine-wrap interactive" role="img" aria-label="Interactive parametric turbine">
+            <canvas id="turbine" aria-hidden="true"></canvas>
           </div>
         </div>
-        <div class="turbine-wrap" role="img" aria-label="Interactive parametric turbine blueprint"><canvas id="turbine" aria-hidden="true"></canvas></div>
       </div>
     </div>
   </section>
 
-  <!-- 03 THE LAUNCH — full countdown cycle -->
+  <!-- 03 LAUNCH -->
   <section class="panel p3" id="launch" aria-label="Act 03 — The Launch">
-    <canvas class="art" id="booster" aria-hidden="true"></canvas>
-    <div class="panel-tab"><span>Act 03</span><span class="dotline"></span><span>The Launch</span></div>
-    <div class="panel-inner">
-      <p class="eyebrow" style="color:var(--flame)">Full launch cycle · countdown → ignition → ascent</p>
-      <h2 class="display">Wait for it.</h2>
-      <p class="lede" style="max-width:40ch">Every twelve seconds: T-minus count, shockwave, pad smoke, camera shake, main engine burn, orbit. Then we do it again — that's engineering.</p>
+    <div class="panel-stage">
+      <canvas class="art" id="booster" aria-hidden="true"></canvas>
+      <div class="panel-tab"><span>Act 03</span><span class="dotline"></span><span>The Launch</span></div>
+      <div class="panel-inner">
+        <p class="eyebrow" style="color:var(--flame)">Full launch cycle · countdown → ignition → ascent</p>
+        <h2 class="display">Wait for it.</h2>
+        <p class="lede" style="max-width:40ch">Every twelve seconds: T-minus count, shockwave, pad smoke, camera shake, main engine burn, orbit. Altitude ∝ t² — that's engineering.</p>
+      </div>
     </div>
   </section>
 
-  <!-- 04 THE SINGULARITY — black hole feeding -->
+  <!-- 04 SINGULARITY -->
   <section class="panel p4" aria-label="Act 04 — The Singularity">
-    <canvas class="art" id="blackhole" aria-hidden="true"></canvas>
-    <div class="panel-tab"><span>Act 04</span><span class="dotline"></span><span>The Singularity</span></div>
-    <div class="panel-inner">
-      <p class="eyebrow">Kepler orbits · doppler beaming · lensed starlight</p>
-      <h2 class="display" style="font-size:clamp(34px,5.5vw,74px)">Watch it feed.</h2>
-      <div class="skill-chips">
-        <span>ω ∝ r<sup>-3/2</sup></span><span>photon ring</span><span>gravitational lensing</span>
-        <span>doppler beaming</span><span>spaghettification</span>
+    <div class="panel-stage">
+      <canvas class="art" id="blackhole" aria-hidden="true"></canvas>
+      <div class="panel-tab"><span>Act 04</span><span class="dotline"></span><span>The Singularity</span></div>
+      <div class="panel-inner">
+        <p class="eyebrow">Kepler orbits · doppler beaming · lensed starlight</p>
+        <h2 class="display" style="font-size:clamp(34px,5.5vw,74px)">Watch it feed.</h2>
+        <div class="skill-chips">
+          <span>ω ∝ r<sup>−3/2</sup></span><span>photon ring</span><span>gravitational lensing</span>
+          <span>doppler beaming</span><span>spaghettification</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- 05 THE SOURCE — flow field -->
+  <!-- 05 SOURCE -->
   <section class="panel p5" aria-label="Act 05 — The Source">
-    <canvas class="art" id="flowfield" aria-hidden="true"></canvas>
-    <div class="panel-tab"><span>Act 05</span><span class="dotline"></span><span>The Source</span></div>
-    <div class="panel-inner">
-      <p class="eyebrow">Connected to the current</p>
-      <h2 class="display">The source of<br>all flow and life.</h2>
-      <p class="lede">Thousands of particles riding one continuous field of coherent noise, reborn forever at a single golden point. Pulses ripple outward and light everything they touch. Your hand is a vortex — move it through the stream.</p>
-      <div class="flow-legend">
-        <div>field ....... θ(x,y,t) = fbm value noise</div>
-        <div>pulse ....... c·t rings, every 2.4 s</div>
-        <div>your hand ... a vortex in the field</div>
+    <div class="panel-stage">
+      <canvas class="art" id="flowfield" aria-hidden="true"></canvas>
+      <div class="panel-tab"><span>Act 05</span><span class="dotline"></span><span>The Source</span></div>
+      <div class="panel-inner">
+        <p class="eyebrow">Connected to the current</p>
+        <h2 class="display">The source of<br>all flow and life.</h2>
+        <p class="lede">Thousands of particles riding one continuous field of fractional Brownian motion. Pulses expand as c·t rings. Your hand is a vortex — curl ω = ∇ × v.</p>
+        <div class="flow-legend">
+          <div>field ....... θ(x,y,t) = fbm value noise</div>
+          <div>pulse ....... c·t rings, every 2.4 s</div>
+          <div>your hand ... a vortex in the field</div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- 06 THE GREAT WAVE — Gerstner physics -->
+  <!-- 06 GREAT WAVE -->
   <section class="panel p6" aria-label="Act 06 — The Great Wave">
-    <canvas class="art" id="greatwave" aria-hidden="true"></canvas>
-    <div class="panel-tab"><span>Act 06</span><span class="dotline"></span><span>神奈川 · The Great Wave</span></div>
-    <div class="panel-inner">
-      <p class="eyebrow">After Hokusai · five sine swells, one boat, zero drama</p>
-      <h2 class="display">The great wave,<br>recomputed.</h2>
-      <span class="hanko">sine · ink · sea</span>
-    </div>
-  </section>
-
-  <!-- 07 THE RAIN — glyphs falling through the screen -->
-  <section class="panel prain" aria-label="Act 07 — The Rain">
-    <canvas class="art" id="rain" aria-hidden="true"></canvas>
-    <div class="panel-tab"><span>Act 07</span><span class="dotline"></span><span>The Rain</span></div>
-    <div class="panel-inner">
-      <p class="eyebrow">Move your hand — the rain parts around it</p>
-      <h2 class="display">Reality is<br>negotiable.</h2>
-      <p class="mono-note">wait for the message · it knows you're there</p>
-    </div>
-  </section>
-
-  <!-- 08 THE OBSERVER — the page watches back -->
-  <section class="panel peye" aria-label="Act 08 — The Observer">
-    <canvas class="art" id="eye" aria-hidden="true"></canvas>
-    <div class="panel-tab"><span>Act 08</span><span class="dotline"></span><span>The Observer</span></div>
-    <div class="panel-inner">
-      <p class="eyebrow" style="color:var(--blue)">Fourth wall · status: broken</p>
-      <h2 class="display">This page can<br>see you.</h2>
-      <div class="telemetry" id="telemetry"></div>
-    </div>
-  </section>
-
-  <!-- 09 THE CONSTELLATION — comms -->
-  <section class="panel p7" id="comms" aria-label="Act 09 — The Constellation">
-    <canvas class="art" id="constellation" aria-hidden="true"></canvas>
-    <div class="panel-tab"><span>Act 09</span><span class="dotline"></span><span>The Constellation</span></div>
-    <div class="panel-inner">
-      <p class="eyebrow" style="color:var(--blue)">Open channel · your pointer joins the sky</p>
-      <h2 class="display" style="font-size:clamp(32px,7vw,92px)">Let's build<br><a href="mailto:enerjadezn@gmail.com">an engine →</a></h2>
-      <div class="socials">
-        <a href="https://github.com/enerjadez" target="_blank" rel="noopener noreferrer">github</a>
-        <a href="https://github.com/enerjadez/jdeportfolio" target="_blank" rel="noopener noreferrer">this repo</a>
-        <a href="mailto:enerjadezn@gmail.com">email</a>
+    <div class="panel-stage">
+      <canvas class="art" id="greatwave" aria-hidden="true"></canvas>
+      <div class="panel-tab"><span>Act 06</span><span class="dotline"></span><span>神奈川 · The Great Wave</span></div>
+      <div class="panel-inner">
+        <p class="eyebrow">After Hokusai · five traveling sines, one boat</p>
+        <h2 class="display">The great wave,<br>recomputed.</h2>
+        <span class="hanko">y = A·sin(kx − ωt)</span>
       </div>
-      <p class="mono-note">Usually replies within one orbit (≈ 24h). Watch for the comet.</p>
     </div>
   </section>
 
-  <!-- 10 THE SIGNAL — finale -->
+  <!-- 07 RAIN -->
+  <section class="panel prain" aria-label="Act 07 — The Rain">
+    <div class="panel-stage">
+      <canvas class="art" id="rain" aria-hidden="true"></canvas>
+      <div class="panel-tab"><span>Act 07</span><span class="dotline"></span><span>The Rain</span></div>
+      <div class="panel-inner">
+        <p class="eyebrow">Move your hand — the rain parts around it</p>
+        <h2 class="display">Reality is<br>negotiable.</h2>
+        <p class="mono-note">wait for the message · it knows you're there</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 OBSERVER -->
+  <section class="panel peye" aria-label="Act 08 — The Observer">
+    <div class="panel-stage">
+      <canvas class="art" id="eye" aria-hidden="true"></canvas>
+      <div class="panel-tab"><span>Act 08</span><span class="dotline"></span><span>The Observer</span></div>
+      <div class="panel-inner">
+        <p class="eyebrow" style="color:var(--blue)">Fourth wall · status: broken</p>
+        <h2 class="display">This page can<br>see you.</h2>
+        <div class="telemetry" id="telemetry"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 CMR AFRICA — THE ELEMENTS OF INSIGHT -->
+  <section class="panel pcmr" id="cmr" aria-label="Act 09 — CMR Africa · Elements of Insight">
+    <div class="panel-stage">
+      <canvas class="art" id="elements" aria-hidden="true"></canvas>
+      <div class="panel-tab"><span>Act 09</span><span class="dotline"></span><span>CMR Africa · Elements</span></div>
+      <div class="panel-inner">
+        <p class="eyebrow">Featured work · Creative Market Research</p>
+        <h2 class="display">Where culture<br>becomes signal.</h2>
+        <p class="lede">Five elemental forces of insight — Earth (truth), Fire (trend), Water (flow), Air (signal), Aether (clarity) — woven as a living African geometric lattice. Move through the market. Watch research crystallize.</p>
+        <div class="element-row" aria-hidden="true">
+          <span class="e-earth"><i></i>Earth</span>
+          <span class="e-fire"><i></i>Fire</span>
+          <span class="e-water"><i></i>Water</span>
+          <span class="e-air"><i></i>Air</span>
+          <span class="e-aether"><i></i>Aether</span>
+        </div>
+        <div class="cta-row">
+          <a class="btn solid interactive" href="https://cmrafrica.com/" target="_blank" rel="noopener noreferrer">Visit cmrafrica.com →</a>
+          <a class="btn interactive" href="https://cmrafrica.com/" target="_blank" rel="noopener noreferrer">insights → impact</a>
+        </div>
+        <p class="mono-note">Commissioned showcase · arts × market physics · CMR Africa</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 CONSTELLATION -->
+  <section class="panel p7" id="comms" aria-label="Act 10 — The Constellation">
+    <div class="panel-stage">
+      <canvas class="art" id="constellation" aria-hidden="true"></canvas>
+      <div class="panel-tab"><span>Act 10</span><span class="dotline"></span><span>The Constellation</span></div>
+      <div class="panel-inner">
+        <p class="eyebrow" style="color:var(--blue)">Open channel · your pointer joins the sky</p>
+        <h2 class="display" style="font-size:clamp(32px,7vw,92px)">Let's build<br><a href="mailto:enerjadezn@gmail.com">an engine →</a></h2>
+        <div class="socials">
+          <a href="https://github.com/enerjadez" target="_blank" rel="noopener noreferrer">github</a>
+          <a href="https://github.com/enerjadez/jdeportfolio" target="_blank" rel="noopener noreferrer">this repo</a>
+          <a href="https://cmrafrica.com/" target="_blank" rel="noopener noreferrer">cmr africa</a>
+          <a href="mailto:enerjadezn@gmail.com">email</a>
+        </div>
+        <p class="mono-note">Usually replies within one orbit (≈ 24h). Watch for the comet.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 SIGNAL -->
   <section class="panel p8" aria-label="Finale — The Signal">
-    <canvas class="art" id="signal" aria-hidden="true"></canvas>
-    <div class="panel-tab"><span>Act ~~</span><span class="dotline"></span><span>The Signal</span></div>
-    <div class="panel-inner">
-      <p class="eyebrow">Outro · carrier wave</p>
-      <h2 class="display">Thanks for scrolling.</h2>
-      <p class="mono-note">© 2026 · JDE · engines by hand, physics by math, magic by both</p>
+    <div class="panel-stage">
+      <canvas class="art" id="signal" aria-hidden="true"></canvas>
+      <div class="panel-tab"><span>Act ~~</span><span class="dotline"></span><span>The Signal</span></div>
+      <div class="panel-inner">
+        <p class="eyebrow">Outro · carrier wave</p>
+        <h2 class="display">Thanks for scrolling.</h2>
+        <p class="mono-note">© 2026 · JDE · engines by hand, physics by math, magic by both</p>
+      </div>
     </div>
   </section>
 
@@ -454,43 +510,52 @@ img,canvas{max-width:100%;display:block}
 
 <script>
 /* ============================================================
-   GLOBALS: reduced motion, adaptive quality, pointer, noise
+   ENGINE CORE — desktop-safe, mobile-fast
+   Critical fixes vs prior build:
+   • Never transform position:sticky nodes (breaks desktop stack)
+   • Never use contain:paint on sticky
+   • Never desynchronized canvas (blank frames on some GPUs)
+   • Never max-width on canvas bitmaps
+   • Size from getBoundingClientRect of parent, not 0×0 client
    ============================================================ */
+(function(){
+'use strict';
+
 const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const NARROW = matchMedia('(max-width:760px)').matches;
 const COARSE = matchMedia('(pointer:coarse)').matches;
-const MOBILE = matchMedia('(max-width:760px)').matches || COARSE;
+const FINE = matchMedia('(pointer:fine)').matches;
 const SAVE_DATA = !!(navigator.connection && navigator.connection.saveData);
-const LOW_CORE = (navigator.hardwareConcurrency || 8) <= 4;
-const LOW_MEM = (navigator.deviceMemory || 8) <= 4;
-/* Quality ladder: 0=eco · 1=balanced · 2=high */
-let QUALITY = REDUCE || SAVE_DATA ? 0 : (MOBILE || LOW_CORE || LOW_MEM ? 1 : 2);
-const DPR_CAP = QUALITY === 0 ? 1 : QUALITY === 1 ? 1.5 : 2;
-let DPR = Math.min(devicePixelRatio || 1, DPR_CAP);
-/* Target frame budget (ms) — used for adaptive throttle */
-const FRAME_BUDGET = QUALITY === 0 ? 1000/24 : QUALITY === 1 ? 1000/30 : 1000/60;
+const LOW = (navigator.hardwareConcurrency||8)<=4 || (navigator.deviceMemory||8)<=4;
+
+/* Quality: 0 eco · 1 balanced · 2 high — width-based, not coarse-only */
+let QUALITY = REDUCE || SAVE_DATA ? 0 : (NARROW || LOW ? 1 : 2);
+const DPR_CAP = QUALITY===0 ? 1 : QUALITY===1 ? 1.5 : 2;
+let DPR = Math.min(window.devicePixelRatio||1, DPR_CAP);
 let PAGE_VISIBLE = !document.hidden;
+
 let MX=.5, MY=.5, MXpx=innerWidth/2, MYpx=innerHeight/2;
-/* Throttled pointer updates (rAF coalescing) */
-let _ptrPending=false, _px=MXpx, _py=MYpx;
+let _pp=false,_px=MXpx,_py=MYpx;
 function onPtr(e){
   _px=e.clientX; _py=e.clientY;
-  if(_ptrPending) return;
-  _ptrPending=true;
+  if(_pp) return;
+  _pp=true;
   requestAnimationFrame(()=>{
-    _ptrPending=false;
+    _pp=false;
     MXpx=_px; MYpx=_py;
-    MX=_px/innerWidth; MY=_py/innerHeight;
+    MX=_px/Math.max(1,innerWidth); MY=_py/Math.max(1,innerHeight);
   });
 }
-addEventListener('pointermove', onPtr, {passive:true});
-addEventListener('pointerdown', onPtr, {passive:true});
-document.addEventListener('visibilitychange', ()=>{ PAGE_VISIBLE = !document.hidden; });
-/* Recalc DPR/mobile on orientation change */
-addEventListener('resize', ()=>{
-  DPR = Math.min(devicePixelRatio || 1, DPR_CAP);
-}, {passive:true});
+addEventListener('pointermove',onPtr,{passive:true});
+addEventListener('pointerdown',onPtr,{passive:true});
+document.addEventListener('visibilitychange',()=>{ PAGE_VISIBLE=!document.hidden; });
+addEventListener('resize',()=>{ DPR=Math.min(devicePixelRatio||1,DPR_CAP); },{passive:true});
 
-/* --- value noise + fbm (shared by hero + flow field) --- */
+/* Desktop custom cursor only when fine pointer + not reduced motion */
+if(FINE && !COARSE && !REDUCE){
+  document.body.classList.add('has-cursor');
+}
+
 function hash(ix,iy){ let n=ix*374761393+iy*668265263; n=(n^(n>>13))*1274126177; return ((n^(n>>16))>>>0)/4294967295; }
 function noise2(x,y){
   const ix=Math.floor(x), iy=Math.floor(y), fx=x-ix, fy=y-iy;
@@ -498,196 +563,216 @@ function noise2(x,y){
   const a=hash(ix,iy), b=hash(ix+1,iy), c=hash(ix,iy+1), d=hash(ix+1,iy+1);
   return a+(b-a)*sx+(c-a)*sy+(a-b-c+d)*sx*sy;
 }
-function fbm(x,y){ return noise2(x,y)*.6 + noise2(x*2.1,y*2.1)*.3 + noise2(x*4.3,y*4.3)*.1; }
+function fbm(x,y){ return noise2(x,y)*.6+noise2(x*2.1,y*2.1)*.3+noise2(x*4.3,y*4.3)*.1; }
+function Q(hi,mid,lo){ return QUALITY>=2?hi:QUALITY===1?mid:lo; }
 
-/* Particle count helper scaled by quality */
-function N(high, mid, low){ return QUALITY>=2 ? high : QUALITY===1 ? mid : low; }
-
-/* ============================================================
-   BOOT SEQUENCE — quick, then reveal
-   ============================================================ */
-(() => {
+/* ---- BOOT ---- */
+(()=>{
   const boot=document.getElementById('boot'), lines=document.getElementById('bootLines');
+  if(!boot) return;
   if(REDUCE){ boot.classList.add('done'); return; }
   const script=[
     '> reality.boot --showcase',
     '> loading wavefunctions ......... ok',
     '> igniting engines .............. ok',
     '> opening singularity ........... ok',
-    '> locating the source ........... found',
+    '> weaving five elements ......... ok',
     '> productivity(reality) += ∞',
   ];
   let i=0;
   const iv=setInterval(()=>{
     const d=document.createElement('div'); d.textContent=script[i]; lines.appendChild(d);
-    if(++i>=script.length){ clearInterval(iv); setTimeout(()=>boot.classList.add('done'),380); }
-  },170);
+    if(++i>=script.length){ clearInterval(iv); setTimeout(()=>boot.classList.add('done'),320); }
+  },150);
   boot.addEventListener('click',()=>boot.classList.add('done'));
+  /* Failsafe: never trap the page under boot */
+  setTimeout(()=>boot.classList.add('done'),4000);
 })();
 
-/* ============================================================
-   CUSTOM CURSOR — lerped crosshair, spins on links
-   (desktop only; hidden via CSS on coarse pointers)
-   ============================================================ */
-(() => {
-  if(COARSE || REDUCE) return;
+/* ---- CURSOR ---- */
+(()=>{
+  if(!document.body.classList.contains('has-cursor')) return;
   const c=document.getElementById('cursor');
   if(!c) return;
-  let x=innerWidth/2,y=innerHeight/2, running=true;
+  let x=innerWidth/2,y=innerHeight/2;
   (function tick(){
-    if(!PAGE_VISIBLE){ requestAnimationFrame(tick); return; }
-    x+=(MXpx-x)*.22; y+=(MYpx-y)*.22;
-    c.style.transform=`translate3d(${x-13}px,${y-13}px,0)`;
-    if(running) requestAnimationFrame(tick);
+    if(PAGE_VISIBLE){
+      x+=(MXpx-x)*.22; y+=(MYpx-y)*.22;
+      c.style.transform=`translate3d(${x-13}px,${y-13}px,0)`;
+    }
+    requestAnimationFrame(tick);
   })();
   document.addEventListener('pointerover',e=>{
-    c.classList.toggle('hot', !!e.target.closest('a,button,.turbine-wrap'));
-  }, {passive:true});
+    c.classList.toggle('hot',!!e.target.closest('a,button,.turbine-wrap,.interactive'));
+  },{passive:true});
 })();
 
-/* ============================================================
-   Canvas loop helper — on-screen only, tab-hidden pause,
-   adaptive skip for mobile/low-power, resize-debounced
-   ============================================================ */
-function loop(canvas, draw, opts={}){
-  const ctx=canvas.getContext('2d', {alpha: opts.alpha !== false, desynchronized: true});
-  let w=0,h=0,raf=null,visible=false,t=0,lastNow=0,skipAccum=0;
-  const every = opts.every || (QUALITY===0 ? 3 : QUALITY===1 ? 2 : 1);
-  let frameN=0;
+/* ---- CANVAS LOOP (desktop-safe) ---- */
+function loop(canvas, draw, opts){
+  opts=opts||{};
+  if(!canvas) return;
+  /* Plain 2d context — desynchronized breaks some desktop GPUs */
+  const ctx=canvas.getContext('2d',{alpha:opts.alpha!==false});
+  if(!ctx) return;
+
+  let w=0,h=0,raf=null,visible=false,t=0,last=0,frameN=0;
+  const every=opts.every!=null?opts.every:(QUALITY===0?2:1);
+
+  function measure(){
+    /* Prefer parent box — absolute canvas can report 0 before layout */
+    const parent=canvas.parentElement;
+    const br=parent?parent.getBoundingClientRect():canvas.getBoundingClientRect();
+    let cw=Math.max(1,Math.round(br.width));
+    let ch=Math.max(1,Math.round(br.height));
+    /* Fallback to viewport if still tiny (sticky pre-layout) */
+    if(cw<2) cw=Math.max(1,innerWidth);
+    if(ch<2) ch=Math.max(1,innerHeight);
+    return {cw,ch};
+  }
+
   function size(){
-    const cw=canvas.clientWidth|0, ch=canvas.clientHeight|0;
-    if(cw<1||ch<1) return;
-    if(cw===w && ch===h && canvas.width===((w*DPR)|0)) return;
+    const {cw,ch}=measure();
+    const bw=(cw*DPR)|0, bh=(ch*DPR)|0;
+    if(cw===w && ch===h && canvas.width===bw && canvas.height===bh) return;
     w=cw; h=ch;
-    canvas.width=(w*DPR)|0; canvas.height=(h*DPR)|0;
+    canvas.width=bw; canvas.height=bh;
+    /* CSS size locked by stylesheet; also set inline as belt-and-suspenders */
+    canvas.style.width=cw+'px';
+    canvas.style.height=ch+'px';
     ctx.setTransform(DPR,0,0,DPR,0,0);
     if(opts.onResize) opts.onResize(w,h);
   }
+
   function frame(now){
-    if(!visible || !PAGE_VISIBLE || REDUCE){ raf=null; return; }
-    const dt = lastNow ? Math.min(0.05, (now-lastNow)/1000) : 1/60;
-    lastNow = now;
+    if(!visible||!PAGE_VISIBLE||REDUCE){ raf=null; return; }
+    const dt=last?Math.min(0.05,(now-last)/1000):1/60;
+    last=now;
     frameN++;
-    /* Adaptive: skip frames on mobile / eco quality */
-    if(every > 1 && (frameN % every)){
-      t += dt;
-      raf = requestAnimationFrame(frame);
+    if(every>1 && (frameN%every)){
+      t+=dt;
+      raf=requestAnimationFrame(frame);
       return;
     }
-    draw(ctx,w,h,t,dt);
-    t += dt * every;
-    raf = requestAnimationFrame(frame);
+    if(w<2||h<2) size();
+    try{ draw(ctx,w,h,t,dt); }catch(err){ /* keep loop alive */ }
+    t+=dt*every;
+    raf=requestAnimationFrame(frame);
   }
   function start(){
     if(raf!=null) return;
-    lastNow = 0;
-    raf = requestAnimationFrame(frame);
+    last=0;
+    size();
+    raf=requestAnimationFrame(frame);
   }
   function stop(){
     if(raf!=null){ cancelAnimationFrame(raf); raf=null; }
   }
-  new IntersectionObserver(([e])=>{
-    visible = e.isIntersecting && e.intersectionRatio > 0;
-    if(visible){ size(); start(); }
-    else stop();
-  },{threshold:[0,0.02,0.1], rootMargin:'8% 0px'}).observe(canvas);
 
-  document.addEventListener('visibilitychange', ()=>{
-    if(PAGE_VISIBLE && visible) start();
+  const io=new IntersectionObserver((entries)=>{
+    const e=entries[0];
+    visible=!!(e&&e.isIntersecting);
+    if(visible) start();
+    else stop();
+  },{threshold:0, rootMargin:'12% 0px'});
+  io.observe(canvas);
+  /* Also observe the panel so sticky cards re-trigger reliably */
+  const panel=canvas.closest('.panel');
+  if(panel) io.observe(panel);
+
+  document.addEventListener('visibilitychange',()=>{
+    if(PAGE_VISIBLE&&visible) start();
     else if(!PAGE_VISIBLE) stop();
   });
 
-  let resizeT=null;
+  let rt=null;
   addEventListener('resize',()=>{
-    clearTimeout(resizeT);
-    resizeT=setTimeout(()=>{ if(visible) size(); }, 120);
-  }, {passive:true});
+    clearTimeout(rt);
+    rt=setTimeout(()=>{ if(visible) size(); },100);
+  },{passive:true});
 
-  size();
-  try{ draw(ctx,w,h,0,0); }catch(_){}
+  /* Initial paint after layout */
+  requestAnimationFrame(()=>{
+    size();
+    try{ draw(ctx,w,h,0,0); }catch(_){}
+    /* Force-start first panel even if IO is late */
+    const r=canvas.getBoundingClientRect();
+    if(r.bottom>0 && r.top<innerHeight){ visible=true; start(); }
+  });
 }
 
 /* ============================================================
-   ACT 01 — ASCII FLUID
-   A grid of glyphs whose brightness is a drifting fbm field;
-   the cursor pours light into it and it flows away like ink.
+   ACT 01 — ASCII FLUID (advection + heat diffusion)
    ============================================================ */
-(() => {
+(()=>{
   const cv=document.getElementById('asciiFluid');
   const ramp=' ·.:-=+*/|<>~#';
-  const CW=MOBILE?18:16, CH=MOBILE?28:26;  // coarser grid on mobile = fewer cells
+  const CW=NARROW?18:15, CH=NARROW?28:24;
   let heat=null, cols=0, rows=0;
 
   loop(cv,(ctx,w,h,t)=>{
-    const nc=Math.ceil(w/CW), nr=Math.ceil(h/CH);
+    const nc=Math.ceil(w/CW)|0, nr=Math.ceil(h/CH)|0;
     if(nc!==cols||nr!==rows){ cols=nc; rows=nr; heat=new Float32Array(cols*rows); }
-
     const mcx=(MX*w/CW)|0, mcy=(MY*h/CH)|0;
-    for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){
+    for(let dy=-3;dy<=3;dy++)for(let dx=-3;dx<=3;dx++){
       const cx2=mcx+dx, cy2=mcy+dy;
       if(cx2>=0&&cx2<cols&&cy2>=0&&cy2<rows)
-        heat[cy2*cols+cx2]=Math.min(1,heat[cy2*cols+cx2]+.5/(1+dx*dx+dy*dy));
+        heat[cy2*cols+cx2]=Math.min(1,heat[cy2*cols+cx2]+.55/(1+dx*dx+dy*dy));
     }
-
     ctx.clearRect(0,0,w,h);
-    ctx.font=`${MOBILE?12:13}px IBM Plex Mono, monospace`;
+    ctx.font=`${NARROW?12:13}px IBM Plex Mono,monospace`;
     ctx.textBaseline='middle';
     for(let y=0;y<rows;y++){
       for(let x=0;x<cols;x++){
         const i=y*cols+x;
-        heat[i]*=.94;
-        const n=fbm(x*.09+t*.13, y*.13-t*.05);
-        let b=n*.9+heat[i];
-        if(b<.42) continue;
-        const gi=Math.min(ramp.length-1,((b-.42)/.58*ramp.length)|0);
-        const a=.14+(b-.42)*1.1+heat[i]*.7;
+        heat[i]*=.93;
+        const n=fbm(x*.09+t*.13,y*.13-t*.05);
+        const b=n*.9+heat[i];
+        if(b<.4) continue;
+        const gi=Math.min(ramp.length-1,((b-.4)/.6*ramp.length)|0);
+        const a=.12+(b-.4)*1.15+heat[i]*.7;
         ctx.fillStyle=`rgba(255,255,255,${Math.min(.95,a)})`;
-        ctx.fillText(ramp[gi], x*CW, y*CH+CH*.45);
+        ctx.fillText(ramp[gi],x*CW,y*CH+CH*.45);
       }
     }
-  }, {every: QUALITY===0 ? 3 : 2});
+  },{every:QUALITY===0?2:1});
 })();
 
 /* ============================================================
-   ACT 02 — TURBINE + AIRFLOW
-   Blueprint turbine; 240 air particles get swallowed, spun by
-   the blades (tangential kick ∝ rpm), and thrown out the back.
+   ACT 02 — TURBINE + ANGULAR MOMENTUM AIRFLOW
    ============================================================ */
-(() => {
+(()=>{
   const cv=document.getElementById('turbine');
-  let rpm=.25, targetRpm=.25, angle=0;
+  if(!cv) return;
+  let rpm=.25, target=.25, angle=0;
   const air=[];
-  const AIR_N=N(240,140,80);
+  const AIR_N=Q(280,150,90);
   const wrap=cv.parentElement;
-  wrap.addEventListener('pointerenter',()=>targetRpm=3.4, {passive:true});
-  wrap.addEventListener('pointerleave',()=>targetRpm=.25, {passive:true});
-  /* Touch: hold to throttle */
-  wrap.addEventListener('pointerdown',e=>{ if(e.pointerType!=='mouse') targetRpm=3.4; }, {passive:true});
-  wrap.addEventListener('pointerup',e=>{ if(e.pointerType!=='mouse') targetRpm=.25; }, {passive:true});
-  wrap.addEventListener('pointercancel',()=>targetRpm=.25, {passive:true});
+  wrap.addEventListener('pointerenter',()=>target=3.5,{passive:true});
+  wrap.addEventListener('pointerleave',()=>target=.25,{passive:true});
+  wrap.addEventListener('pointerdown',e=>{ if(e.pointerType!=='mouse') target=3.5; },{passive:true});
+  wrap.addEventListener('pointerup',e=>{ if(e.pointerType!=='mouse') target=.25; },{passive:true});
+  wrap.addEventListener('pointercancel',()=>target=.25,{passive:true});
 
-  function spawnAir(w,h){ return {x:-10-Math.random()*40, y:Math.random()*h, vx:1.2+Math.random(), vy:0}; }
+  function spawn(w,h){ return {x:-10-Math.random()*50,y:Math.random()*h,vx:1.2+Math.random(),vy:0}; }
 
   loop(cv,(ctx,w,h,t)=>{
-    rpm+=(targetRpm-rpm)*.045; angle+=rpm*.02;
+    rpm+=(target-rpm)*.05; angle+=rpm*.02;
     ctx.clearRect(0,0,w,h);
     const cx=w/2, cy=h/2, R=Math.min(w,h)*.4;
     const blue='#0000f2';
+    if(air.length===0) for(let i=0;i<AIR_N;i++) air.push(Object.assign(spawn(w,h),{x:Math.random()*w}));
 
-    /* ---- airflow behind the linework ---- */
-    if(air.length===0) for(let i=0;i<AIR_N;i++) air.push({...spawnAir(w,h), x:Math.random()*w});
     ctx.lineWidth=1;
     for(const p of air){
-      const dx=p.x-cx, dy=p.y-cy, d=Math.hypot(dx,dy);
+      const dx=p.x-cx, dy=p.y-cy, d=Math.hypot(dx,dy)||1;
       const suck=Math.max(0,1-d/(R*2.2));
-      // intake pull toward the disc axis, then spin + exhaust
-      p.vx+=suck*.25*(1+rpm*.4);
-      p.vy+=(-dy/Math.max(d,1))*suck*.35;
-      if(d<R){                                  // inside: blades grab it
+      p.vx+=suck*.28*(1+rpm*.4);
+      p.vy+=(-dy/d)*suck*.38;
+      if(d<R){
         const tang=Math.atan2(dy,dx)+Math.PI/2;
-        p.vx+=Math.cos(tang)*rpm*.5;
-        p.vy+=Math.sin(tang)*rpm*.5;
-        p.vx+=.6+rpm*.35;                       // thrust out the back
+        p.vx+=Math.cos(tang)*rpm*.55;
+        p.vy+=Math.sin(tang)*rpm*.55;
+        p.vx+=.65+rpm*.4;
       }
       p.vx*=.96; p.vy*=.96;
       const nx=p.x+p.vx, ny=p.y+p.vy;
@@ -695,14 +780,13 @@ function loop(canvas, draw, opts={}){
       ctx.strokeStyle=`rgba(0,0,242,${Math.min(.55,.08+sp*.06)})`;
       ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(nx,ny); ctx.stroke();
       p.x=nx; p.y=ny;
-      if(p.x>w+20||p.y<-20||p.y>h+20) Object.assign(p,spawnAir(w,h));
+      if(p.x>w+20||p.y<-20||p.y>h+20) Object.assign(p,spawn(w,h));
     }
 
-    /* ---- schematic linework ---- */
     ctx.strokeStyle=blue; ctx.fillStyle=blue;
-    ctx.lineWidth=1.6; ctx.beginPath(); ctx.arc(cx,cy,R,0,7); ctx.stroke();
+    ctx.lineWidth=1.6; ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.stroke();
     ctx.lineWidth=.7; ctx.setLineDash([4,6]);
-    ctx.beginPath(); ctx.arc(cx,cy,R*1.12,0,7); ctx.stroke(); ctx.setLineDash([]);
+    ctx.beginPath(); ctx.arc(cx,cy,R*1.12,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
     ctx.lineWidth=.5; ctx.globalAlpha=.5;
     ctx.beginPath();
     ctx.moveTo(cx-R*1.25,cy); ctx.lineTo(cx+R*1.25,cy);
@@ -711,43 +795,39 @@ function loop(canvas, draw, opts={}){
 
     const N=12;
     for(let i=0;i<N;i++){
-      const a=angle+i*(Math.PI*2/N);
+      const a0=angle+i*(Math.PI*2/N);
       ctx.beginPath();
       for(let s=0;s<=1;s+=.1){
-        const r=R*.22+s*(R*.72), sweep=a+s*.9;
-        const x=cx+Math.cos(sweep)*r, y=cy+Math.sin(sweep)*r;
+        const r=R*.22+s*(R*.72), sw=a0+s*.9;
+        const x=cx+Math.cos(sw)*r, y=cy+Math.sin(sw)*r;
         s===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
       }
       for(let s=1;s>=0;s-=.1){
-        const r=R*.22+s*(R*.72), sweep=a+s*.9+.16*(1-s*.5);
-        ctx.lineTo(cx+Math.cos(sweep)*r, cy+Math.sin(sweep)*r);
+        const r=R*.22+s*(R*.72), sw=a0+s*.9+.16*(1-s*.5);
+        ctx.lineTo(cx+Math.cos(sw)*r,cy+Math.sin(sw)*r);
       }
       ctx.closePath();
       ctx.lineWidth=1.1; ctx.globalAlpha=.9; ctx.stroke();
       ctx.globalAlpha=.06; ctx.fill(); ctx.globalAlpha=1;
     }
-
     ctx.lineWidth=1.4;
-    ctx.beginPath(); ctx.arc(cx,cy,R*.2,0,7); ctx.stroke();
-    ctx.beginPath(); ctx.arc(cx,cy,R*.07,0,7); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,cy,R*.2,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,cy,R*.07,0,Math.PI*2); ctx.stroke();
     for(let i=0;i<6;i++){
-      const a=angle+i*Math.PI/3;
-      ctx.beginPath(); ctx.arc(cx+Math.cos(a)*R*.14, cy+Math.sin(a)*R*.14, 3, 0, 7); ctx.stroke();
+      const a0=angle+i*Math.PI/3;
+      ctx.beginPath(); ctx.arc(cx+Math.cos(a0)*R*.14,cy+Math.sin(a0)*R*.14,3,0,Math.PI*2); ctx.stroke();
     }
-    ctx.font='11px IBM Plex Mono, monospace'; ctx.globalAlpha=.75;
-    ctx.fillText(`Ø ${(R*2|0)}px`, cx+R*.82, cy-R*1.02);
-    ctx.fillText(`${(rpm*1000|0)} rpm`, cx+R*.82, cy-R*1.02+16);
+    ctx.font='11px IBM Plex Mono,monospace'; ctx.globalAlpha=.75;
+    ctx.fillText(`Ø ${(R*2|0)}px`,cx+R*.82,cy-R*1.02);
+    ctx.fillText(`${(rpm*1000|0)} rpm`,cx+R*.82,cy-R*1.02+16);
     ctx.globalAlpha=1;
   });
 })();
 
 /* ============================================================
-   ACT 03 — THE LAUNCH, enhanced
-   Moon with craters · tower strobes · pad glow · MAX-Q call ·
-   velocity telemetry · payload dot sailing across after sep.
-   Same 12-second cycle: countdown → ignition → ascent → orbit.
+   ACT 03 — LAUNCH (Δv, MAX-Q, ballistic climb)
    ============================================================ */
-(() => {
+(()=>{
   const cv=document.getElementById('booster');
   const P=[], SMOKE=[], S=[];
   const CYCLE=12, COUNT=3;
@@ -759,29 +839,24 @@ function loop(canvas, draw, opts={}){
     const padY=h*.72;
     const alt=burning?Math.pow(burn,2.2)*26:0;
     const vel=burning?2.2*Math.pow(burn,1.2)*26:0;
-    const rx=w*.5, ry=padY-90-alt + (burning?Math.sin(t*40)*Math.min(2,burn):0);
-
+    const rx=w*.5, ry=padY-90-alt+(burning?Math.sin(t*40)*Math.min(2,burn):0);
     const shake=burning?Math.max(0,1-burn*1.4)*7:0;
+
     ctx.save();
     ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);
-
-    /* sky */
     ctx.fillStyle='#07070f'; ctx.fillRect(-10,-10,w+20,h+20);
 
-    /* moon: pale disc + craters, drifting very slowly */
     const moonX=w*.16+Math.sin(t*.02)*8, moonY=h*.18;
     const mg=ctx.createRadialGradient(moonX,moonY,10,moonX,moonY,90);
     mg.addColorStop(0,'rgba(220,224,240,.14)'); mg.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=mg; ctx.beginPath(); ctx.arc(moonX,moonY,90,0,7); ctx.fill();
-    ctx.fillStyle='#c9cde0';
-    ctx.beginPath(); ctx.arc(moonX,moonY,34,0,7); ctx.fill();
+    ctx.fillStyle='#c9cde0'; ctx.beginPath(); ctx.arc(moonX,moonY,34,0,7); ctx.fill();
     ctx.fillStyle='rgba(150,156,180,.5)';
-    [[ -10,-8,6],[9,4,4],[2,14,5],[-14,10,3],[13,-12,3]].forEach(([dx,dy,r])=>{
+    [[-10,-8,6],[9,4,4],[2,14,5],[-14,10,3],[13,-12,3]].forEach(([dx,dy,r])=>{
       ctx.beginPath(); ctx.arc(moonX+dx,moonY+dy,r,0,7); ctx.fill();
     });
 
-    /* stars streak faster the higher we are */
-    if(S.length===0) for(let i=0;i<90;i++) S.push({x:Math.random()*w,y:Math.random()*h,v:1+Math.random()*4});
+    if(S.length===0) for(let i=0;i<Q(100,70,45);i++) S.push({x:Math.random()*w,y:Math.random()*h,v:1+Math.random()*4});
     const streak=1+Math.min(alt*.004,6);
     ctx.strokeStyle='rgba(255,255,255,.5)';
     for(const s of S){
@@ -791,7 +866,6 @@ function loop(canvas, draw, opts={}){
     }
     ctx.globalAlpha=1;
 
-    /* ground + tower */
     ctx.strokeStyle='rgba(242,240,233,.5)'; ctx.lineWidth=1.5;
     ctx.beginPath(); ctx.moveTo(0,padY+30); ctx.lineTo(w,padY+30); ctx.stroke();
     ctx.lineWidth=1;
@@ -802,14 +876,12 @@ function loop(canvas, draw, opts={}){
       ctx.moveTo(rx-56,padY+18-i*28); ctx.lineTo(rx-80,padY+2-i*28);
     }
     ctx.stroke();
-    /* tower strobes: alternating red beacons */
     const blink=Math.sin(t*6)>0;
     ctx.fillStyle=blink?'rgba(255,60,60,.95)':'rgba(255,60,60,.15)';
     ctx.beginPath(); ctx.arc(rx-80,padY-170,3,0,7); ctx.fill();
     ctx.fillStyle=!blink?'rgba(255,60,60,.95)':'rgba(255,60,60,.15)';
     ctx.beginPath(); ctx.arc(rx-80,padY-86,3,0,7); ctx.fill();
 
-    /* pad glow while the engine is low: firelight on the ground */
     if(burning&&alt<240){
       const gi=Math.max(0,1-alt/240);
       const pg=ctx.createRadialGradient(rx,padY+28,0,rx,padY+28,220);
@@ -820,8 +892,6 @@ function loop(canvas, draw, opts={}){
       ctx.beginPath(); ctx.ellipse(rx,padY+28,220,60,0,0,7); ctx.fill();
       ctx.globalCompositeOperation='source-over';
     }
-
-    /* ignition shockwave + flash */
     if(burning&&burn<.9){
       const rr=burn*w*.7;
       ctx.strokeStyle=`rgba(255,190,90,${1-burn/.9})`;
@@ -830,11 +900,9 @@ function loop(canvas, draw, opts={}){
       ctx.fillStyle=`rgba(255,240,200,${(1-burn/.9)*.25})`;
       ctx.fillRect(-10,-10,w+20,h+20);
     }
-
-    /* pad smoke */
     if(burning&&alt<200){
-      for(let i=0;i<6;i++)
-        SMOKE.push({x:rx+(Math.random()-.5)*30, y:padY+22, vx:(Math.random()-.5)*4-(Math.random()<.5?2:-2)*Math.random()*2, vy:-Math.random()*1.2, r:8+Math.random()*10, life:1});
+      for(let i=0;i<5;i++)
+        SMOKE.push({x:rx+(Math.random()-.5)*30,y:padY+22,vx:(Math.random()-.5)*4,vy:-Math.random()*1.2,r:8+Math.random()*10,life:1});
     }
     for(const s of SMOKE){
       s.x+=s.vx; s.y+=s.vy; s.vx*=.985; s.r+=.5; s.life-=.008;
@@ -843,15 +911,13 @@ function loop(canvas, draw, opts={}){
       ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,7); ctx.fill();
     }
     while(SMOKE.length&&SMOKE[0].life<=0) SMOKE.shift();
-    while(SMOKE.length>500) SMOKE.shift();
+    while(SMOKE.length>400) SMOKE.shift();
 
-    /* exhaust plume */
     if(burning){
       const nozzleY=ry+120;
-      for(let i=0;i<12;i++){
-        if(P.length>460) P.shift();
-        const spread=(Math.random()-.5)*.6;
-        P.push({x:rx+(Math.random()-.5)*10,y:nozzleY,vx:spread*2.4,vy:6+Math.random()*4,life:1,r:3+Math.random()*5});
+      for(let i=0;i<Q(14,10,6);i++){
+        if(P.length>420) P.shift();
+        P.push({x:rx+(Math.random()-.5)*10,y:nozzleY,vx:(Math.random()-.5)*1.4,vy:6+Math.random()*4,life:1,r:3+Math.random()*5});
       }
     }
     ctx.globalCompositeOperation='lighter';
@@ -868,7 +934,6 @@ function loop(canvas, draw, opts={}){
     while(P.length&&P[0].life<=0) P.shift();
     ctx.globalCompositeOperation='source-over';
 
-    /* rocket */
     if(ry>-160){
       ctx.save(); ctx.translate(rx,ry);
       ctx.strokeStyle='#f2f0e9'; ctx.lineWidth=1.5; ctx.fillStyle='#0a0a14';
@@ -885,50 +950,40 @@ function loop(canvas, draw, opts={}){
       ctx.beginPath(); ctx.arc(0,-12,9,0,7); ctx.stroke();
       ctx.restore();
     }
-
-    /* payload after separation: a bright dot arcing across the top */
     if(burning&&ry<=-160){
-      const op=Math.min(1,(burn-Math.pow((h*.72-90+160)/26,1/2.2))*.4);
       const px2=w*.2+((burn*60)%(w*.8));
       const py2=h*.12+Math.sin(px2*.01)*10;
       ctx.fillStyle=`rgba(140,220,255,${.5+.5*Math.sin(t*8)})`;
       ctx.beginPath(); ctx.arc(px2,py2,2.4,0,7); ctx.fill();
-      ctx.strokeStyle='rgba(140,220,255,.25)'; ctx.lineWidth=1;
-      ctx.beginPath(); ctx.moveTo(px2-26,py2+2); ctx.lineTo(px2,py2); ctx.stroke();
     }
+    ctx.restore();
 
-    ctx.restore(); // shake
-
-    /* HUD */
     if(!burning){
       const n=Math.ceil(COUNT-ct);
-      ctx.font='700 64px IBM Plex Mono, monospace';
+      ctx.font='700 64px IBM Plex Mono,monospace';
       ctx.fillStyle=`rgba(255,122,26,${.4+.6*Math.abs(Math.sin(ct*Math.PI))})`;
-      ctx.fillText(`T-${n}`, w*.5-58, h*.3);
-      ctx.font='11px IBM Plex Mono, monospace';
+      ctx.fillText(`T-${n}`,w*.5-58,h*.3);
+      ctx.font='11px IBM Plex Mono,monospace';
       ctx.fillStyle='rgba(242,240,233,.55)';
-      ctx.fillText('guidance internal · pressurization nominal', w*.5-140, h*.3+26);
+      ctx.fillText('guidance internal · pressurization nominal',w*.5-140,h*.3+26);
     }else{
-      /* MAX-Q callout mid-ascent */
       if(burn>2.6&&burn<4.2){
-        ctx.font='700 26px IBM Plex Mono, monospace';
+        ctx.font='700 26px IBM Plex Mono,monospace';
         ctx.fillStyle=`rgba(255,122,26,${.4+.6*Math.abs(Math.sin(t*6))})`;
-        ctx.fillText('MAX-Q', w*.5+70, h*.32);
+        ctx.fillText('MAX-Q',w*.5+70,h*.32);
       }
-      ctx.font='11px IBM Plex Mono, monospace';
+      ctx.font='11px IBM Plex Mono,monospace';
       ctx.fillStyle='rgba(242,240,233,.6)';
       const msg=alt>h?'stage separation confirmed · payload in orbit':'main engine burn · thrust nominal';
-      ctx.fillText(`T+${burn.toFixed(1)}s · alt ${(alt|0)}m · vel ${(vel|0)}m/s · ${msg}`, 16, h-18);
+      ctx.fillText(`T+${burn.toFixed(1)}s · alt ${(alt|0)}m · vel ${(vel|0)}m/s · ${msg}`,16,h-18);
     }
   });
 })();
 
 /* ============================================================
-   ACT 04 — THE SINGULARITY (slow, heavy, inevitable)
-   Slower disk, longer star cycle, lazy tidal stream. Gravity
-   shouldn't hurry.
+   ACT 04 — SINGULARITY (Kepler ω∝r^{-3/2})
    ============================================================ */
-(() => {
+(()=>{
   const cv=document.getElementById('blackhole');
   let disk=null, stars=null;
   const stream=[];
@@ -936,21 +991,18 @@ function loop(canvas, draw, opts={}){
 
   loop(cv,(ctx,w,h,t)=>{
     const cx=w*.5, cy=h*.42, RS=Math.min(w,h)*.09;
-
     if(!disk){
       disk=[]; stars=[];
-      const n=N(800,420,220);
+      const n=Q(900,480,260);
       for(let i=0;i<n;i++) disk.push({a:Math.random()*Math.PI*2,r:RS*(1.4+Math.pow(Math.random(),1.6)*4.5),z:(Math.random()-.5)*.22});
-      for(let i=0;i<N(140,80,50);i++) stars.push({x:Math.random(),y:Math.random(),m:Math.random()});
+      for(let i=0;i<Q(160,90,50);i++) stars.push({x:Math.random(),y:Math.random(),m:Math.random()});
     }
-
     ctx.fillStyle='#020208'; ctx.fillRect(0,0,w,h);
 
-    /* lensed background stars */
     for(const s of stars){
       let x=s.x*w, y=s.y*h;
-      const dx=x-cx, dy=y-cy, d=Math.hypot(dx,dy);
-      const bend=(RS*RS*2.2)/Math.max(d,1);
+      const dx=x-cx, dy=y-cy, d=Math.hypot(dx,dy)||1;
+      const bend=(RS*RS*2.2)/d;
       x+=dx/d*bend; y+=dy/d*bend;
       if(d<RS*1.35) continue;
       ctx.globalAlpha=.25+s.m*.6; ctx.fillStyle='#cdd3ff';
@@ -958,10 +1010,9 @@ function loop(canvas, draw, opts={}){
     }
     ctx.globalAlpha=1;
 
-    /* the doomed star: one slow pass every 16s */
     const oa=(t%STAR_CYCLE)/STAR_CYCLE*Math.PI*2;
     const starX=cx+Math.cos(oa)*w*.42;
-    const starY=cy+Math.sin(oa)*h*.30 - h*.06;
+    const starY=cy+Math.sin(oa)*h*.30-h*.06;
     const dStar=Math.hypot(starX-cx,starY-cy);
     const doomed=dStar<RS*3.4;
     const eaten=doomed?Math.min(1,(RS*3.4-dStar)/(RS*2)):0;
@@ -969,13 +1020,12 @@ function loop(canvas, draw, opts={}){
     const sg=ctx.createRadialGradient(starX,starY,0,starX,starY,starR*4);
     sg.addColorStop(0,'rgba(255,250,230,.95)'); sg.addColorStop(.4,'rgba(255,220,150,.4)'); sg.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(starX,starY,starR*4,0,7); ctx.fill();
-    if(doomed && stream.length<600){
-      for(let i=0;i<2;i++)
-        stream.push({x:starX,y:starY,a:Math.atan2(starY-cy,starX-cx),r:dStar,life:1});
+    if(doomed&&stream.length<600){
+      for(let i=0;i<2;i++) stream.push({x:starX,y:starY,a:Math.atan2(starY-cy,starX-cx),r:dStar,life:1});
     }
     ctx.globalCompositeOperation='lighter';
     for(const p of stream){
-      p.a+=0.45*Math.pow(RS/Math.max(p.r,RS),1.5);   // lazy spiral
+      p.a+=0.45*Math.pow(RS/Math.max(p.r,RS),1.5);
       p.r-=0.7; p.life-=.0035;
       if(p.life<=0||p.r<RS*1.1) continue;
       const x=cx+Math.cos(p.a)*p.r, y=cy+Math.sin(p.a)*p.r*.5;
@@ -984,7 +1034,6 @@ function loop(canvas, draw, opts={}){
     }
     for(let i=stream.length-1;i>=0;i--) if(stream[i].life<=0||stream[i].r<RS*1.1) stream.splice(i,1);
 
-    /* accretion disk — about a third the old speed */
     const tilt=.32;
     for(const p of disk){
       p.a+=0.3*Math.pow(RS/p.r,1.5);
@@ -1006,30 +1055,24 @@ function loop(canvas, draw, opts={}){
       }
     }
     ctx.globalCompositeOperation='source-over';
-
-    /* photon ring + shadow, slow shimmer */
     const shim=.85+Math.sin(t*1.1)*.08;
     const g=ctx.createRadialGradient(cx,cy,RS*.6,cx,cy,RS*1.5);
     g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(.72,'rgba(0,0,0,1)');
     g.addColorStop(.8,`rgba(255,190,120,${shim})`); g.addColorStop(.86,'rgba(120,80,255,.25)');
     g.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,RS*1.5,0,7); ctx.fill();
-
-    ctx.font='11px IBM Plex Mono, monospace'; ctx.fillStyle='rgba(255,255,255,.4)';
-    ctx.fillText(doomed?'tidal disruption event in progress':'ω ∝ r^-3/2 · a star approaches', cx+RS*1.7, cy);
-  });
+    ctx.font='11px IBM Plex Mono,monospace'; ctx.fillStyle='rgba(255,255,255,.4)';
+    ctx.fillText(doomed?'tidal disruption event in progress':'ω ∝ r^−3/2 · a star approaches',cx+RS*1.7,cy);
+  },{onResize:()=>{ disk=null; }});
 })();
 
 /* ============================================================
-   ACT 05 — THE SOURCE
-   fbm-noise vector field, particles born at one golden point,
-   luminous pulse rings that light particles as they pass,
-   cursor vortex.
+   ACT 05 — SOURCE (fBm field + vortex)
    ============================================================ */
-(() => {
+(()=>{
   const cv=document.getElementById('flowfield');
   let pts=null, W=0, H=0;
-  const COUNT=N(2400,1100,600);
+  const COUNT=Q(2600,1200,700);
   const PULSE_EVERY=2.4, PULSE_SPEED=260;
 
   function spawn(w,h,anywhere){
@@ -1043,34 +1086,25 @@ function loop(canvas, draw, opts={}){
   loop(cv,(ctx,w,h,t)=>{
     if(!pts||W!==w||H!==h) reset(w,h);
     ctx.fillStyle='rgba(3,17,13,.09)'; ctx.fillRect(0,0,w,h);
-
-    const sx=w*.22, sy=h*.62;
-    const mx=MX*w, my=MY*h;
-    // active pulse radius (most recent ring)
+    const sx=w*.22, sy=h*.62, mx=MX*w, my=MY*h;
     const pt2=t%PULSE_EVERY, pulseR=pt2*PULSE_SPEED;
-
     ctx.lineWidth=1;
     for(const p of pts){
-      let a=fbm(p.x*.0035+t*.02, p.y*.0035)*Math.PI*4;
+      let a=fbm(p.x*.0035+t*.02,p.y*.0035)*Math.PI*4;
       const dx=p.x-mx, dy=p.y-my, d2=dx*dx+dy*dy;
-      if(d2<160*160) a+=(1-Math.sqrt(d2)/160)*2.4;     // cursor vortex
+      if(d2<160*160) a+=(1-Math.sqrt(d2)/160)*2.4;
       const vx=Math.cos(a)*1.6, vy=Math.sin(a)*1.6;
       const nx=p.x+vx, ny=p.y+vy;
-
       const ds=Math.hypot(p.x-sx,p.y-sy);
       const dsn=ds/Math.hypot(w,h);
       const gold=Math.max(0,1-dsn*3.2);
-      // pulse boost: bright band where the ring passes
       const band=Math.exp(-Math.pow((ds-pulseR)/26,2));
       const A=.16+gold*.5+band*.7;
       ctx.strokeStyle=`rgba(${(90+gold*165+band*60)|0},${(140+gold*60+band*70)|0},${(120-gold*60+band*80)|0},${Math.min(.95,A)})`;
       ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(nx,ny); ctx.stroke();
-
       p.x=nx; p.y=ny; p.life--;
       if(p.life<0||p.x<-20||p.x>w+20||p.y<-20||p.y>h+20) Object.assign(p,spawn(w,h,false));
     }
-
-    /* the source: pulsing gold core + the expanding ring itself */
     const pulse=1+Math.sin(t*2.2)*.12;
     const g=ctx.createRadialGradient(sx,sy,0,sx,sy,60*pulse);
     g.addColorStop(0,'rgba(255,230,160,.9)');
@@ -1084,26 +1118,20 @@ function loop(canvas, draw, opts={}){
 })();
 
 /* ============================================================
-   ACT 06 — THE GREAT WAVE · clean traveling swells
-   Every layer moves the SAME direction at its own speed
-   (parallax: far = slow, near = fast). Foam curls sit exactly
-   on the crest peaks — solved from sin(kx−ωt)=1 — so they ride
-   the waves instead of floating loose. ~6 paths per frame.
+   ACT 06 — GREAT WAVE (traveling sines)
    ============================================================ */
-(() => {
+(()=>{
   const cv=document.getElementById('greatwave');
-
-  // layer surface: primary traveling sine + a small harmonic locked to it
   function surf(x,w,t,base,amp,k,sp,ph){
-    const p=(x/w)*k - t*sp + ph;
-    return base - Math.sin(p)*amp - Math.sin(p*2.7+1.3)*amp*.22;
+    const p=(x/w)*k-t*sp+ph;
+    return base-Math.sin(p)*amp-Math.sin(p*2.7+1.3)*amp*.22;
   }
   function curl(ctx,x,y,size,t,seed){
     ctx.save(); ctx.translate(x,y); ctx.rotate(Math.sin(t+seed)*.08);
     ctx.beginPath(); ctx.moveTo(0,0);
     let px=0,py=0;
     for(let s=0;s<1;s+=.125){
-      const a=-.3 - s*3.8, r=size*(1-s*.7);
+      const a=-.3-s*3.8, r=size*(1-s*.7);
       px=Math.cos(a)*r; py=Math.sin(a)*r+size*.2;
       ctx.lineTo(px,py);
     }
@@ -1113,23 +1141,19 @@ function loop(canvas, draw, opts={}){
     ctx.beginPath(); ctx.arc(px,py,Math.max(1.1,size*.1),0,7); ctx.fill();
     ctx.restore();
   }
-
-  // base height · amplitude · wavenumber · speed · phase · color · foam?
   const layers=[
-    {base:.58, amp:.014, k:8,  sp:.22, ph:1.1, col:'#5d84a6', foam:false},
-    {base:.66, amp:.026, k:7,  sp:.30, ph:3.6, col:'#3f6a8f', foam:false},
-    {base:.75, amp:.042, k:6,  sp:.40, ph:0.2, col:'#2b5a80', foam:true},
-    {base:.86, amp:.058, k:5,  sp:.52, ph:4.4, col:'#16344f', foam:true},
-    {base:.96, amp:.032, k:7,  sp:.66, ph:2.0, col:'#102638', foam:true},
+    {base:.58,amp:.014,k:8,sp:.22,ph:1.1,col:'#5d84a6',foam:false},
+    {base:.66,amp:.026,k:7,sp:.30,ph:3.6,col:'#3f6a8f',foam:false},
+    {base:.75,amp:.042,k:6,sp:.40,ph:0.2,col:'#2b5a80',foam:true},
+    {base:.86,amp:.058,k:5,sp:.52,ph:4.4,col:'#16344f',foam:true},
+    {base:.96,amp:.032,k:7,sp:.66,ph:2.0,col:'#102638',foam:true},
   ];
 
   loop(cv,(ctx,w,h,t)=>{
-    /* sky */
     const sky=ctx.createLinearGradient(0,0,0,h);
     sky.addColorStop(0,'#e9dcbe'); sky.addColorStop(.5,'#efe4c9'); sky.addColorStop(1,'#e2d3b0');
     ctx.fillStyle=sky; ctx.fillRect(0,0,w,h);
 
-    /* fuji */
     const fx=w*.63, fy=h*.5, fw=w*.10;
     ctx.beginPath();
     ctx.moveTo(fx-fw,fy); ctx.lineTo(fx,fy-fw*.62); ctx.lineTo(fx+fw,fy);
@@ -1139,15 +1163,13 @@ function loop(canvas, draw, opts={}){
     ctx.quadraticCurveTo(fx,fy-fw*.34,fx-fw*.3,fy-fw*.43);
     ctx.fillStyle='#f1e8d3'; ctx.fill();
 
-    const U=Math.min(w,h), STEP=QUALITY>=2?12:QUALITY===1?16:20;
+    const U=Math.min(w,h), STEP=QUALITY>=2?11:QUALITY===1?15:20;
     for(const L of layers){
       const amp=U*L.amp;
-      /* fill */
       ctx.beginPath(); ctx.moveTo(-10,h+10);
-      for(let x=-10;x<=w+10;x+=STEP) ctx.lineTo(x, surf(x,w,t,h*L.base,amp,L.k,L.sp,L.ph));
+      for(let x=-10;x<=w+10;x+=STEP) ctx.lineTo(x,surf(x,w,t,h*L.base,amp,L.k,L.sp,L.ph));
       ctx.lineTo(w+10,h+10); ctx.closePath();
       ctx.fillStyle=L.col; ctx.fill();
-      /* double cream crest line — woodblock feel */
       for(const [off,al,lw] of [[0,.8,2],[amp*.28,.35,1]]){
         ctx.beginPath();
         for(let x=-10;x<=w+10;x+=STEP){
@@ -1156,11 +1178,10 @@ function loop(canvas, draw, opts={}){
         }
         ctx.strokeStyle=`rgba(241,232,211,${al})`; ctx.lineWidth=lw; ctx.stroke();
       }
-      /* foam curls at the true crest peaks: sin(p)=1 → p=π/2+2πn */
       if(L.foam){
         for(let n=-1;n<=Math.ceil(L.k/(Math.PI*2))+1;n++){
-          const p=Math.PI/2 + n*Math.PI*2;
-          const x=((p + t*L.sp - L.ph)/L.k)*w;
+          const p=Math.PI/2+n*Math.PI*2;
+          const x=((p+t*L.sp-L.ph)/L.k)*w;
           if(x<-40||x>w+40) continue;
           const y=surf(x,w,t,h*L.base,amp,L.k,L.sp,L.ph);
           curl(ctx,x,y,amp*.55,t,n*7+L.ph);
@@ -1168,12 +1189,10 @@ function loop(canvas, draw, opts={}){
       }
     }
 
-    /* boat riding the middle swell */
     const L3=layers[2], amp3=U*L3.amp;
-    const bx=w*.5 + Math.sin(t*.12)*w*.26;
+    const bx=w*.5+Math.sin(t*.12)*w*.26;
     const by=surf(bx,w,t,h*L3.base,amp3,L3.k,L3.sp,L3.ph);
-    const slope=(surf(bx+12,w,t,h*L3.base,amp3,L3.k,L3.sp,L3.ph)
-               - surf(bx-12,w,t,h*L3.base,amp3,L3.k,L3.sp,L3.ph))/24;
+    const slope=(surf(bx+12,w,t,h*L3.base,amp3,L3.k,L3.sp,L3.ph)-surf(bx-12,w,t,h*L3.base,amp3,L3.k,L3.sp,L3.ph))/24;
     ctx.save(); ctx.translate(bx,by-3); ctx.rotate(Math.atan(slope));
     ctx.beginPath();
     ctx.moveTo(-U*.045,0);
@@ -1186,76 +1205,58 @@ function loop(canvas, draw, opts={}){
     }
     ctx.restore();
 
-    /* cartouche */
     const bx2=w-158, by2=64;
     ctx.fillStyle='rgba(241,232,211,.92)'; ctx.fillRect(bx2,by2,124,44);
     ctx.strokeStyle='#16344f'; ctx.lineWidth=1.4; ctx.strokeRect(bx2,by2,124,44);
-    ctx.fillStyle='#16344f'; ctx.font='10px IBM Plex Mono, monospace';
-    ctx.fillText('KANAGAWA-OKI', bx2+10, by2+18);
-    ctx.fillText('y = A·sin(kx − ωt)', bx2+10, by2+33);
+    ctx.fillStyle='#16344f'; ctx.font='10px IBM Plex Mono,monospace';
+    ctx.fillText('KANAGAWA-OKI',bx2+10,by2+18);
+    ctx.fillText('y = A·sin(kx − ωt)',bx2+10,by2+33);
   });
 })();
 
 /* ============================================================
-   ACT 07 — THE RAIN
-   Columns of falling glyphs (katakana + digits). Trails come
-   free from a translucent fade-fill. Your cursor is a hole in
-   the rain — glyphs refuse to render near it. Every ~10s the
-   rain dims and a message types itself to whoever is watching.
+   ACT 07 — RAIN (glyph matrix + hand void)
    ============================================================ */
-(() => {
+(()=>{
   const cv=document.getElementById('rain');
   const GLYPHS='アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789/<>+=*';
-  const FS=MOBILE?18:16;
+  const FS=NARROW?18:16;
   let cols=null, W=0;
-  const MSG="WAKE UP — YES, YOU, HOLDING THE SCREEN";
+  const MSG='WAKE UP — YES, YOU, HOLDING THE SCREEN';
   const MSG_CYCLE=10;
 
   loop(cv,(ctx,w,h,t)=>{
     if(!cols||W!==w){
       W=w; cols=[];
-      for(let i=0;i<Math.ceil(w/FS);i++)
-        cols.push({y:Math.random()*-h, v:2.5+Math.random()*4});
+      for(let i=0;i<Math.ceil(w/FS);i++) cols.push({y:Math.random()*-h,v:2.5+Math.random()*4});
     }
-    /* fade for trails */
     ctx.fillStyle='rgba(2,6,4,.10)'; ctx.fillRect(0,0,w,h);
-
     const mCyc=t%MSG_CYCLE;
-    const msgOn=mCyc>6.2;                       // last ~3.8s of each cycle
+    const msgOn=mCyc>6.2;
     const dim=msgOn?.35:1;
-
-    /* cursor position relative to this canvas */
     const r=cv.getBoundingClientRect();
     const hx=MXpx-r.left, hy=MYpx-r.top;
-
-    ctx.font=FS+'px IBM Plex Mono, monospace';
+    ctx.font=FS+'px IBM Plex Mono,monospace';
     for(let i=0;i<cols.length;i++){
       const c=cols[i], x=i*FS;
       c.y+=c.v*2;
       if(c.y>h+40){ c.y=Math.random()*-200; c.v=2.5+Math.random()*4; }
-      /* the hand-hole: skip drawing near the pointer */
       const dx=x-hx, dy=c.y-hy;
       if(dx*dx+dy*dy<80*80) continue;
-      /* head glyph bright, one echo above */
       const g1=GLYPHS[((i*31+(c.y/FS))|0)%GLYPHS.length];
       ctx.fillStyle=`rgba(200,255,220,${.95*dim})`;
       ctx.fillText(g1,x,c.y);
       ctx.fillStyle=`rgba(60,255,140,${.5*dim})`;
       ctx.fillText(GLYPHS[((i*17+(c.y/FS)-1)|0)%GLYPHS.length],x,c.y-FS);
     }
-
-    /* faint ring where the hand parts the rain */
     if(hx>0&&hx<w&&hy>0&&hy<h){
       ctx.strokeStyle='rgba(60,255,140,.18)'; ctx.lineWidth=1;
       ctx.beginPath(); ctx.arc(hx,hy,80,0,7); ctx.stroke();
     }
-
-    /* the message: types itself, glitching, then dissolves */
     if(msgOn){
-      const p=Math.min(1,(mCyc-6.2)/1.6);       // typing progress
+      const p=Math.min(1,(mCyc-6.2)/1.6);
       const shown=MSG.slice(0,(p*MSG.length)|0);
-      ctx.font='700 clamp(18px,3vw,30px) IBM Plex Mono, monospace';
-      ctx.font='700 26px IBM Plex Mono, monospace';
+      ctx.font='700 26px IBM Plex Mono,monospace';
       const tw=ctx.measureText(MSG).width;
       const bx=w/2-tw/2, by=h*.42;
       ctx.fillStyle='rgba(2,6,4,.75)';
@@ -1263,28 +1264,24 @@ function loop(canvas, draw, opts={}){
       ctx.strokeStyle='rgba(60,255,140,.5)';
       ctx.strokeRect(bx-20,by-34,tw+40,52);
       for(let i=0;i<shown.length;i++){
-        const jx=(Math.random()-.5)*(Math.random()<.06?6:0);   // rare glitch
+        const jx=(Math.random()-.5)*(Math.random()<.06?6:0);
         ctx.fillStyle=Math.random()<.03?'#fff':'#3cff8c';
-        ctx.fillText(shown[i], bx+i*(tw/MSG.length)+jx, by);
+        ctx.fillText(shown[i],bx+i*(tw/MSG.length)+jx,by);
       }
-      if(p<1&&(t*8|0)%2) ctx.fillText('▌', bx+shown.length*(tw/MSG.length), by);
+      if(p<1&&(t*8|0)%2) ctx.fillText('▌',bx+shown.length*(tw/MSG.length),by);
     }
-  }, {every: QUALITY===0 ? 3 : 2});
+  },{every:QUALITY===0?2:1});
 })();
 
 /* ============================================================
-   ACT 08 — THE OBSERVER
-   A blueprint eye whose pupil follows your cursor and blinks;
-   beside it, live telemetry of *you*: your screen, your pointer,
-   your time on this page, the frames it has drawn for you.
+   ACT 08 — OBSERVER (tracking eye + telemetry)
    ============================================================ */
-(() => {
+(()=>{
   const cv=document.getElementById('eye');
   const tel=document.getElementById('telemetry');
   const t0=performance.now();
   let frames=0, fps=60, lastF=performance.now(), fCount=0;
 
-  /* fps meter independent of card visibility */
   (function meter(){
     fCount++;
     const now=performance.now();
@@ -1292,100 +1289,311 @@ function loop(canvas, draw, opts={}){
     requestAnimationFrame(meter);
   })();
 
-  /* telemetry text, 4x/sec */
   setInterval(()=>{
+    if(!tel) return;
     const secs=((performance.now()-t0)/1000)|0;
     const mm=String((secs/60)|0).padStart(2,'0'), ss=String(secs%60).padStart(2,'0');
     const max=document.documentElement.scrollHeight-innerHeight;
     const sc=max>0?Math.round(scrollY/max*100):0;
     tel.innerHTML=
-      `<div><b>your screen</b> .... ${innerWidth} × ${innerHeight} @ ${DPR}x</div>`+
-      `<div><b>your pointer</b> ... ${MXpx|0}, ${MYpx|0} — we watch it move</div>`+
+      `<div><b>your screen</b> .... ${innerWidth} × ${innerHeight} @ ${DPR.toFixed(2)}x</div>`+
+      `<div><b>your pointer</b> ... ${MXpx|0}, ${MYpx|0}</div>`+
       `<div><b>time with us</b> ... ${mm}:${ss}</div>`+
       `<div><b>scroll depth</b> ... ${sc}% of the show</div>`+
-      `<div><b>frames drawn</b> ... ${frames.toLocaleString()} for your eyes only</div>`+
-      `<div><b>render</b> ......... ${fps} fps, live, right now</div>`;
+      `<div><b>frames drawn</b> ... ${frames.toLocaleString()}</div>`+
+      `<div><b>render</b> ......... ${fps} fps · Q${QUALITY}</div>`;
   },250);
 
   loop(cv,(ctx,w,h,t)=>{
     frames++;
     ctx.clearRect(0,0,w,h);
-    /* Mobile: eye sits more centered so it isn't clipped */
-    const cx=MOBILE?w*.55:w*.72, cy=h*.44, R=Math.min(w,h)*(MOBILE?.18:.20);
+    const cx=NARROW?w*.55:w*.72, cy=h*.44, R=Math.min(w,h)*(NARROW?.18:.20);
     const blue='#0000f2';
     ctx.strokeStyle=blue; ctx.fillStyle=blue;
-
-    /* blink: quick close every ~4.6s */
     const bp=t%4.6;
-    const lid=bp<.28?Math.sin(bp/.28*Math.PI):0;    // 0 open → 1 closed
-
-    /* almond outline (two arcs) */
+    const lid=bp<.28?Math.sin(bp/.28*Math.PI):0;
     ctx.lineWidth=1.8;
     ctx.beginPath();
     ctx.moveTo(cx-R*1.6,cy);
     ctx.quadraticCurveTo(cx,cy-R*1.25*(1-lid),cx+R*1.6,cy);
     ctx.quadraticCurveTo(cx,cy+R*1.25*(1-lid*.9),cx-R*1.6,cy);
     ctx.closePath(); ctx.stroke();
-
     if(lid<.92){
       ctx.save(); ctx.clip();
-      /* iris follows your cursor */
-      const dx=MXpx-(cv.getBoundingClientRect().left+cx);
-      const dy=MYpx-(cv.getBoundingClientRect().top+cy);
+      const rect=cv.getBoundingClientRect();
+      const dx=MXpx-(rect.left+cx);
+      const dy=MYpx-(rect.top+cy);
       const d=Math.hypot(dx,dy)||1, off=Math.min(R*.45,d*.08);
       const ix=cx+dx/d*off, iy=cy+dy/d*off;
-      /* iris ring + radial lines */
       ctx.lineWidth=1.6;
       ctx.beginPath(); ctx.arc(ix,iy,R*.62,0,7); ctx.stroke();
       ctx.lineWidth=.7; ctx.globalAlpha=.6;
       for(let i=0;i<24;i++){
         const a=i/24*Math.PI*2+t*.15;
         ctx.beginPath();
-        ctx.moveTo(ix+Math.cos(a)*R*.3, iy+Math.sin(a)*R*.3);
-        ctx.lineTo(ix+Math.cos(a)*R*.6, iy+Math.sin(a)*R*.6);
+        ctx.moveTo(ix+Math.cos(a)*R*.3,iy+Math.sin(a)*R*.3);
+        ctx.lineTo(ix+Math.cos(a)*R*.6,iy+Math.sin(a)*R*.6);
         ctx.stroke();
       }
       ctx.globalAlpha=1;
-      /* pupil + glint */
       ctx.beginPath(); ctx.arc(ix,iy,R*.26,0,7); ctx.fill();
       ctx.fillStyle='#f2f0e9';
       ctx.beginPath(); ctx.arc(ix-R*.08,iy-R*.09,R*.05,0,7); ctx.fill();
       ctx.fillStyle=blue;
       ctx.restore();
     }
-
-    /* dimension ticks + label, schematic style */
     ctx.lineWidth=.7; ctx.setLineDash([4,6]); ctx.globalAlpha=.5;
     ctx.beginPath(); ctx.arc(cx,cy,R*1.9,0,7); ctx.stroke();
-    ctx.setLineDash([]); ctx.globalAlpha=1;
-    ctx.font='11px IBM Plex Mono, monospace';
-    ctx.globalAlpha=.7;
-    ctx.fillText('SUBJECT: YOU', cx+R*1.4, cy-R*1.6);
-    ctx.fillText(lid>.5?'(blinking)':'(tracking)', cx+R*1.4, cy-R*1.6+16);
+    ctx.setLineDash([]); ctx.globalAlpha=.7;
+    ctx.font='11px IBM Plex Mono,monospace';
+    ctx.fillText('SUBJECT: YOU',cx+R*1.4,cy-R*1.6);
+    ctx.fillText(lid>.5?'(blinking)':'(tracking)',cx+R*1.4,cy-R*1.6+16);
     ctx.globalAlpha=1;
   });
 })();
 
 /* ============================================================
-   ACT 09 — THE CONSTELLATION
-   Orbiting bodies with trails, lines linking neighbours and
-   your cursor into one constellation; a comet crosses ~9s.
+   ACT 09 — CMR AFRICA · THE FIVE ELEMENTS OF INSIGHT
+   Earth · Fire · Water · Air · Aether as a living geometric
+   market lattice — African-inspired chevrons, diamonds, rings.
+   Cursor is the research lens; insight crystallizes at center.
+   Visit: https://cmrafrica.com/
    ============================================================ */
-(() => {
+(()=>{
+  const cv=document.getElementById('elements');
+  if(!cv) return;
+
+  const ELEMENTS=[
+    {name:'Earth',  col:'#c45c26', hue:22,  orbit:.22, phase:0,   symbol:'hex'},
+    {name:'Fire',   col:'#e85d04', hue:18,  orbit:.32, phase:1.2, symbol:'tri'},
+    {name:'Water',  col:'#1d4e89', hue:210, orbit:.42, phase:2.4, symbol:'wave'},
+    {name:'Air',    col:'#f4d35e', hue:48,  orbit:.52, phase:3.6, symbol:'chev'},
+    {name:'Aether', col:'#f8f1e3', hue:40,  orbit:.14, phase:0.5, symbol:'star'},
+  ];
+  let beads=[], nodes=[];
+
+  function reset(w,h){
+    const cx=w*.62, cy=h*.48, R=Math.min(w,h)*.38;
+    nodes=[];
+    /* African textile lattice: concentric rings + radial spokes + diamond grid */
+    for(let ring=1;ring<=5;ring++){
+      const n=ring*6;
+      for(let i=0;i<n;i++){
+        const a=(i/n)*Math.PI*2+ring*.15;
+        const r=R*(.18+ring*.14);
+        nodes.push({
+          x:cx+Math.cos(a)*r, y:cy+Math.sin(a)*r*.72,
+          ring, a, r, el:ELEMENTS[ring%5]
+        });
+      }
+    }
+    beads=[];
+    const BN=Q(220,130,80);
+    for(let i=0;i<BN;i++){
+      const el=ELEMENTS[i%5];
+      beads.push({
+        el, a:Math.random()*Math.PI*2,
+        r:R*(el.orbit+Math.random()*.08),
+        sp:(.4+Math.random()*.6)*(i%2?1:-1)*.35,
+        life:Math.random(),
+        size:1.2+Math.random()*2.2
+      });
+    }
+  }
+
+  function drawSymbol(ctx, type, x, y, s, col, t){
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=1.4;
+    if(type==='hex'){
+      ctx.beginPath();
+      for(let i=0;i<6;i++){
+        const a=i*Math.PI/3+t*.1;
+        const px=Math.cos(a)*s, py=Math.sin(a)*s;
+        i?ctx.lineTo(px,py):ctx.moveTo(px,py);
+      }
+      ctx.closePath(); ctx.stroke();
+    }else if(type==='tri'){
+      ctx.beginPath();
+      for(let i=0;i<3;i++){
+        const a=-Math.PI/2+i*Math.PI*2/3+t*.2;
+        const px=Math.cos(a)*s, py=Math.sin(a)*s;
+        i?ctx.lineTo(px,py):ctx.moveTo(px,py);
+      }
+      ctx.closePath(); ctx.stroke();
+      ctx.globalAlpha=.15; ctx.fill(); ctx.globalAlpha=1;
+    }else if(type==='wave'){
+      ctx.beginPath();
+      for(let i=0;i<=12;i++){
+        const u=i/12;
+        const px=(u-.5)*s*2.2;
+        const py=Math.sin(u*Math.PI*2+t*2)*s*.35;
+        i?ctx.lineTo(px,py):ctx.moveTo(px,py);
+      }
+      ctx.stroke();
+    }else if(type==='chev'){
+      ctx.beginPath();
+      ctx.moveTo(-s,s*.6); ctx.lineTo(0,-s*.5); ctx.lineTo(s,s*.6);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-s*.7,s*.95); ctx.lineTo(0,-s*.1); ctx.lineTo(s*.7,s*.95);
+      ctx.stroke();
+    }else{ /* star / aether */
+      ctx.beginPath();
+      for(let i=0;i<10;i++){
+        const a=-Math.PI/2+i*Math.PI/5;
+        const rr=i%2?s*.4:s;
+        const px=Math.cos(a)*rr, py=Math.sin(a)*rr;
+        i?ctx.lineTo(px,py):ctx.moveTo(px,py);
+      }
+      ctx.closePath(); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  loop(cv,(ctx,w,h,t)=>{
+    if(!nodes.length) reset(w,h);
+    const cx=w*.62, cy=h*.48, R=Math.min(w,h)*.38;
+    const rect=cv.getBoundingClientRect();
+    const lx=MXpx-rect.left, ly=MYpx-rect.top;
+
+    /* Night ground */
+    const bg=ctx.createRadialGradient(cx,cy,0,cx,cy,R*1.8);
+    bg.addColorStop(0,'#2a1810'); bg.addColorStop(.55,'#1a0f0a'); bg.addColorStop(1,'#0e0806');
+    ctx.fillStyle=bg; ctx.fillRect(0,0,w,h);
+
+    /* Soft dust field */
+    ctx.fillStyle='rgba(244,211,94,.04)';
+    for(let i=0;i<40;i++){
+      const px=((i*97+t*12)%w), py=((i*53+t*7)%h);
+      ctx.fillRect(px,py,1.2,1.2);
+    }
+
+    /* Lattice rings (textile geometry) */
+    ctx.lineWidth=1;
+    for(let ring=1;ring<=5;ring++){
+      const el=ELEMENTS[ring%5];
+      ctx.strokeStyle=el.col;
+      ctx.globalAlpha=.12+ring*.03;
+      ctx.beginPath();
+      ctx.ellipse(cx,cy,R*(.18+ring*.14),R*(.18+ring*.14)*.72,0,0,Math.PI*2);
+      ctx.stroke();
+    }
+    /* Radial spokes */
+    ctx.globalAlpha=.1;
+    for(let i=0;i<12;i++){
+      const a=i*Math.PI/6+t*.02;
+      ctx.strokeStyle=ELEMENTS[i%5].col;
+      ctx.beginPath();
+      ctx.moveTo(cx+Math.cos(a)*R*.12,cy+Math.sin(a)*R*.12*.72);
+      ctx.lineTo(cx+Math.cos(a)*R*.88,cy+Math.sin(a)*R*.88*.72);
+      ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+
+    /* Node diamonds + links to cursor lens */
+    for(const n of nodes){
+      const pulse=.7+.3*Math.sin(t*2+n.a*3);
+      ctx.fillStyle=n.el.col;
+      ctx.globalAlpha=.35*pulse;
+      ctx.beginPath();
+      ctx.moveTo(n.x,n.y-3.5); ctx.lineTo(n.x+3.5,n.y); ctx.lineTo(n.x,n.y+3.5); ctx.lineTo(n.x-3.5,n.y);
+      ctx.closePath(); ctx.fill();
+      /* research lens: connect near cursor */
+      const d=Math.hypot(n.x-lx,n.y-ly);
+      if(d<R*.28){
+        ctx.globalAlpha=(1-d/(R*.28))*.45;
+        ctx.strokeStyle=n.el.col; ctx.lineWidth=.8;
+        ctx.beginPath(); ctx.moveTo(n.x,n.y); ctx.lineTo(lx,ly); ctx.stroke();
+      }
+    }
+    ctx.globalAlpha=1;
+
+    /* Element beads on orbits (market signals) */
+    for(const b of beads){
+      b.a+=b.sp*.016;
+      /* Pointer gravity — research focus bends paths */
+      const bx=cx+Math.cos(b.a)*b.r;
+      const by=cy+Math.sin(b.a)*b.r*.72;
+      const dx=lx-bx, dy=ly-by, d2=dx*dx+dy*dy;
+      if(d2<R*R*.25){
+        const d=Math.sqrt(d2)||1;
+        b.a+= (dx*Math.sin(b.a)-dy*Math.cos(b.a))/d * .02;
+      }
+      const x=cx+Math.cos(b.a)*b.r;
+      const y=cy+Math.sin(b.a)*b.r*.72;
+      const g=ctx.createRadialGradient(x,y,0,x,y,b.size*3);
+      g.addColorStop(0,b.el.col);
+      g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.globalCompositeOperation='lighter';
+      ctx.fillStyle=g;
+      ctx.beginPath(); ctx.arc(x,y,b.size*3,0,7); ctx.fill();
+      ctx.globalCompositeOperation='source-over';
+      ctx.fillStyle=b.el.col;
+      ctx.globalAlpha=.9;
+      ctx.beginPath(); ctx.arc(x,y,b.size,0,7); ctx.fill();
+      ctx.globalAlpha=1;
+    }
+
+    /* Five elemental guardians around center */
+    for(let i=0;i<5;i++){
+      const el=ELEMENTS[i];
+      const a=t*.25+el.phase+i*(Math.PI*2/5);
+      const rr=R*(.55+Math.sin(t+i)*.03);
+      const x=cx+Math.cos(a)*rr;
+      const y=cy+Math.sin(a)*rr*.72;
+      drawSymbol(ctx, el.symbol, x, y, 14+Math.sin(t*2+i)*2, el.col, t);
+      /* soft orbital trail */
+      ctx.strokeStyle=el.col; ctx.globalAlpha=.18; ctx.lineWidth=1.2;
+      ctx.beginPath();
+      ctx.ellipse(cx,cy,rr,rr*.72,0,a-.4,a);
+      ctx.stroke();
+      ctx.globalAlpha=1;
+    }
+
+    /* Aether core — crystallizing insight */
+    const core=1+Math.sin(t*1.8)*.08;
+    const cg=ctx.createRadialGradient(cx,cy,0,cx,cy,R*.22*core);
+    cg.addColorStop(0,'rgba(248,241,227,.95)');
+    cg.addColorStop(.35,'rgba(244,211,94,.45)');
+    cg.addColorStop(.7,'rgba(196,92,38,.2)');
+    cg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=cg; ctx.beginPath(); ctx.arc(cx,cy,R*.22*core,0,7); ctx.fill();
+    drawSymbol(ctx,'star',cx,cy,18*core,'#f8f1e3',t);
+
+    /* Cursor research lens */
+    if(lx>0&&lx<w&&ly>0&&ly<h){
+      ctx.strokeStyle='rgba(248,241,227,.35)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(lx,ly,28,0,7); ctx.stroke();
+      ctx.beginPath(); ctx.arc(lx,ly,8,0,7); ctx.stroke();
+      ctx.setLineDash([3,5]);
+      ctx.beginPath(); ctx.moveTo(lx-36,ly); ctx.lineTo(lx+36,ly);
+      ctx.moveTo(lx,ly-36); ctx.lineTo(lx,ly+36); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    /* Caption plate */
+    ctx.font='11px IBM Plex Mono,monospace';
+    ctx.fillStyle='rgba(248,241,227,.45)';
+    ctx.fillText('CMR · elements of insight · culture → signal', 16, h-20);
+  },{onResize:(w,h)=>reset(w,h)});
+})();
+
+/* ============================================================
+   ACT 10 — CONSTELLATION
+   ============================================================ */
+(()=>{
   const cv=document.getElementById('constellation');
   const bodies=[];
   for(let i=0;i<7;i++) bodies.push({r:.10+i*.065,sp:.6/(i+1)+.12,a:Math.random()*7,e:.15+Math.random()*.25,trail:[]});
 
   loop(cv,(ctx,w,h,t)=>{
     ctx.clearRect(0,0,w,h);
-    const cx=MOBILE?w*.6:w*.74, cy=h*.34, base=Math.min(w,h);
+    const cx=NARROW?w*.55:w*.74, cy=h*.34, base=Math.min(w,h);
     const blue='#0000f2';
     ctx.strokeStyle=blue; ctx.fillStyle=blue;
-
-    /* Pointer in canvas-local space */
     const rect=cv.getBoundingClientRect();
     const lx=MXpx-rect.left, ly=MYpx-rect.top;
-
     const pos=[];
     for(const b of bodies){
       b.a+=b.sp*.012;
@@ -1394,7 +1602,7 @@ function loop(canvas, draw, opts={}){
       ctx.beginPath(); ctx.ellipse(cx,cy,rx,ry,.4,0,7); ctx.stroke();
       const x=cx+Math.cos(b.a)*rx*Math.cos(.4)-Math.sin(b.a)*ry*Math.sin(.4);
       const y=cy+Math.cos(b.a)*rx*Math.sin(.4)+Math.sin(b.a)*ry*Math.cos(.4);
-      b.trail.push([x,y]); if(b.trail.length>(MOBILE?14:26)) b.trail.shift();
+      b.trail.push([x,y]); if(b.trail.length>(NARROW?14:26)) b.trail.shift();
       ctx.lineWidth=1.4;
       ctx.beginPath();
       b.trail.forEach((p,i)=>{ctx.globalAlpha=i/b.trail.length*.5;i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]);});
@@ -1403,7 +1611,6 @@ function loop(canvas, draw, opts={}){
       ctx.beginPath(); ctx.arc(x,y,3,0,7); ctx.fill();
       pos.push([x,y]);
     }
-    /* constellation lines: neighbours + cursor (local coords) */
     pos.push([lx,ly]);
     ctx.lineWidth=.8;
     for(let i=0;i<pos.length;i++)for(let j=i+1;j<pos.length;j++){
@@ -1415,8 +1622,6 @@ function loop(canvas, draw, opts={}){
     }
     ctx.globalAlpha=.7;
     ctx.beginPath(); ctx.arc(cx,cy,5,0,7); ctx.fill();
-
-    /* comet: diagonal pass every 9s */
     const cT=(t%9)/9;
     if(cT<.35){
       const p2=cT/.35;
@@ -1436,15 +1641,13 @@ function loop(canvas, draw, opts={}){
 })();
 
 /* ============================================================
-   ACT 08 — THE SIGNAL
-   Layered sine ribbons with double-pass glow, drifting star
-   specks, hue that slowly breathes. Pointer bends the field.
+   ACT 11 — SIGNAL (carrier wave field)
    ============================================================ */
-(() => {
+(()=>{
   const cv=document.getElementById('signal');
-  const LINES=N(42,28,18);
+  const LINES=Q(44,28,18);
   const STEP=QUALITY>=2?6:QUALITY===1?8:10;
-  const SPECK_MAX=N(70,40,20);
+  const SPECK_MAX=Q(70,40,20);
   const specks=[];
 
   loop(cv,(ctx,w,h,t)=>{
@@ -1466,12 +1669,11 @@ function loop(canvas, draw, opts={}){
       for(let x=0;x<=w;x+=STEP){
         const nx=x/w;
         const y=baseY
-          + Math.sin(nx*6+t*.9+l*.35)*(14+f*30)*(.6+MY)
-          + Math.sin(nx*13-t*.6+l*.8)*6
-          + Math.sin(nx*2.2+t*.25)*24*(MX-.5)*2;
+          +Math.sin(nx*6+t*.9+l*.35)*(14+f*30)*(.6+MY)
+          +Math.sin(nx*13-t*.6+l*.8)*6
+          +Math.sin(nx*2.2+t*.25)*24*(MX-.5)*2;
         x===0?path.moveTo(x,y):path.lineTo(x,y);
       }
-      /* Skip glow pass on eco quality */
       if(QUALITY>0){
         ctx.strokeStyle=`hsla(${hue},100%,${50-f*14}%,${.05+f*.12})`;
         ctx.lineWidth=5+f*5; ctx.stroke(path);
@@ -1479,15 +1681,15 @@ function loop(canvas, draw, opts={}){
       ctx.strokeStyle=`hsla(${hue},100%,${62-f*20}%,${.16+f*.55})`;
       ctx.lineWidth=.8+f*1.3; ctx.stroke(path);
     }
-  }, {every: QUALITY===0 ? 2 : 1});
+  });
 })();
 
 /* ============================================================
-   Card-stack fold + frame index + scroll progress
-   rAF-throttled scroll · will-change only on active panels
+   CARD STACK — transform .panel-stage NEVER .panel (sticky)
    ============================================================ */
-(() => {
+(()=>{
   const panels=[...document.querySelectorAll('.panel')];
+  const stages=panels.map(p=>p.querySelector('.panel-stage'));
   const idx=[...document.querySelectorAll('#frameIndex span')];
   const bar=document.getElementById('scrollbar');
   let ticking=false, lastActive=-1;
@@ -1506,27 +1708,30 @@ function loop(canvas, draw, opts={}){
           const nr=next.getBoundingClientRect();
           covered=Math.min(1,Math.max(0,1-nr.top/vh));
         }
-        if(!REDUCE && !MOBILE){
-          /* Desktop card fold — skip transform thrash on mobile Safari */
-          p.style.transform=`scale(${1-covered*.07}) translateY(${covered*-18}px)`;
-          p.style.filter=`brightness(${1-covered*.45})`;
+        const stage=stages[i];
+        if(stage && !REDUCE){
+          /* Transform the STAGE, not the sticky panel — desktop-safe */
+          const s=1-covered*.08;
+          const y=covered*-20;
+          stage.style.transform=`translate3d(0,${y}px,0) scale(${s})`;
+          stage.style.filter=covered>0.01?`brightness(${1-covered*.5})`:'none';
         }
         if(r.top<=vh*.5) active=i;
       });
       if(active!==lastActive){
-        if(lastActive>=0) panels[lastActive]?.classList.remove('is-active');
-        panels[active]?.classList.add('is-active');
         lastActive=active;
         idx.forEach((s,i)=>s.classList.toggle('on',i===active));
       }
       const max=document.documentElement.scrollHeight-innerHeight;
-      if(bar && max>0) bar.style.width=((scrollY/max)*100)+'%';
+      if(bar&&max>0) bar.style.width=((scrollY/max)*100)+'%';
     });
   }
   addEventListener('scroll',onScroll,{passive:true});
   addEventListener('resize',onScroll,{passive:true});
   onScroll();
 })();
+
+})(); // end IIFE
 </script>
 </body>
 </html>
