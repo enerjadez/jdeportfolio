@@ -582,52 +582,73 @@ function Q(hi,mid,lo){ return QUALITY>=2?hi:QUALITY===1?mid:lo; }
 const SCENES=[];
 function loop(canvas, draw, opts){
   opts=opts||{};
-  if(!canvas) return;
-  const ctx=canvas.getContext('2d');
-  if(!ctx) return;
+  if(!canvas){ console.warn('[JDE] missing canvas'); return; }
+  let ctx=null;
+  try{ ctx=canvas.getContext('2d'); }catch(e){ console.error('[JDE] getContext', e); return; }
+  if(!ctx){ console.warn('[JDE] no 2d ctx', canvas.id); return; }
   SCENES.push({
     canvas, ctx, draw, opts,
     sizeHost: canvas.parentElement||canvas,
     cullHost: canvas.closest('.panel')||canvas.parentElement||canvas,
-    w:0,h:0,t:0,frameN:0,
+    w:0,h:0,t:0,frameN:0, errN:0,
     every: opts.every!=null?opts.every:(QUALITY===0?2:1)
   });
 }
 function resizeScene(s){
-  const br=s.sizeHost.getBoundingClientRect();
-  let cw=Math.round(br.width), ch=Math.round(br.height);
-  if(cw<2||ch<2){ const pr=s.cullHost.getBoundingClientRect(); if(cw<2) cw=Math.round(pr.width); if(ch<2) ch=Math.round(pr.height); }
-  if(cw<2) cw=innerWidth||800; if(ch<2) ch=innerHeight||600;
-  const bw=Math.max(1,(cw*DPR)|0), bh=Math.max(1,(ch*DPR)|0);
-  if(s.w===cw&&s.h===ch&&s.canvas.width===bw&&s.canvas.height===bh) return;
-  s.w=cw; s.h=ch; s.canvas.width=bw; s.canvas.height=bh;
-  s.ctx.setTransform(DPR,0,0,DPR,0,0);
-  if(s.opts.onResize) try{ s.opts.onResize(cw,ch); }catch(e){}
+  try{
+    const br=s.sizeHost.getBoundingClientRect();
+    let cw=Math.round(br.width)||0, ch=Math.round(br.height)||0;
+    if(cw<2||ch<2){
+      const pr=s.cullHost.getBoundingClientRect();
+      if(cw<2) cw=Math.round(pr.width)||0;
+      if(ch<2) ch=Math.round(pr.height)||0;
+    }
+    if(cw<2) cw=Math.max(320, window.innerWidth||800);
+    if(ch<2) ch=Math.max(480, window.innerHeight||600);
+    const bw=Math.max(1, Math.floor(cw*DPR));
+    const bh=Math.max(1, Math.floor(ch*DPR));
+    if(s.w===cw&&s.h===ch&&s.canvas.width===bw&&s.canvas.height===bh) return;
+    s.w=cw; s.h=ch;
+    s.canvas.width=bw; s.canvas.height=bh;
+    s.ctx.setTransform(DPR,0,0,DPR,0,0);
+    if(s.opts.onResize) s.opts.onResize(cw,ch);
+  }catch(e){ console.error('[JDE] resize', s.canvas&&s.canvas.id, e); }
 }
 let _last=0, _started=false;
 function engine(now){
   requestAnimationFrame(engine);
   if(document.hidden) return;
   const dt=_last?Math.min(0.05,(now-_last)/1000):1/60; _last=now;
-  const vh=innerHeight||800, margin=160;
+  const vh=window.innerHeight||800, margin=200;
   for(let i=0;i<SCENES.length;i++){
-    const s=SCENES[i], r=s.cullHost.getBoundingClientRect();
+    const s=SCENES[i];
+    if(s.errN>8) continue; /* skip chronically broken scenes */
+    let r;
+    try{ r=s.cullHost.getBoundingClientRect(); }catch(_){ continue; }
     if(r.bottom<-margin||r.top>vh+margin) continue;
     s.frameN++;
     if(s.every>1&&(s.frameN%s.every)){ s.t+=dt; continue; }
     resizeScene(s);
     if(s.w<2||s.h<2) continue;
-    try{ s.draw(s.ctx,s.w,s.h,s.t,dt); }catch(err){ console.error('[JDE]',s.canvas.id,err); }
+    try{ s.draw(s.ctx,s.w,s.h,s.t,dt); s.errN=0; }
+    catch(err){ s.errN++; if(s.errN<=2) console.error('[JDE] draw', s.canvas.id, err); }
     s.t+=dt*s.every;
   }
 }
 function bootEngine(){
   if(_started) return; _started=true;
-  console.info('[JDE] engine · scenes=', SCENES.length);
-  for(const s of SCENES){ try{ resizeScene(s); if(s.w>0) s.draw(s.ctx,s.w,s.h,0,0); }catch(e){} }
+  console.info('[JDE] engine start · scenes=', SCENES.length, '· Q=', QUALITY, '· dpr=', DPR);
+  for(const s of SCENES){
+    try{ resizeScene(s); if(s.w>0&&s.h>0) s.draw(s.ctx,s.w,s.h,0,0); }
+    catch(e){ console.error('[JDE] first paint', s.canvas&&s.canvas.id, e); }
+  }
   requestAnimationFrame(engine);
+  /* Keep engine alive if rAF was throttled */
+  setInterval(()=>{ if(document.hidden) return; }, 5000);
 }
 addEventListener('resize',()=>{ for(const s of SCENES) resizeScene(s); },{passive:true});
+/* Also start on window load as belt-and-suspenders */
+addEventListener('load', ()=>{ setTimeout(bootEngine, 0); });
 
 /* ========== 01 ASCII FLUID ========== */
 (()=>{
