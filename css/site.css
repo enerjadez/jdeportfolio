@@ -1,0 +1,247 @@
+/* ============================================================
+   JDE · A Showcase of Magic — design tokens
+   ============================================================ */
+:root{
+  --blue:#0000f2; --blue-deep:#0000a8;
+  --paper:#f2f0e9; --ink:#0a0a10;
+  --flame:#ff7a1a; --gold:#e8b44a;
+  --jp-sky:#e9dcbe; --jp-blue:#16344f; --jp-cream:#f1e8d3;
+  --cmr-earth:#c45c26; --cmr-fire:#e85d04; --cmr-water:#1d4e89;
+  --cmr-air:#f4d35e; --cmr-aether:#f8f1e3; --cmr-night:#1a0f0a;
+  --line:rgba(16,16,20,.18); --line-blue:rgba(255,255,255,.22);
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --sans:'Space Grotesk',system-ui,sans-serif;
+  --card-radius:22px;
+  --gutter:clamp(16px,4vw,56px);
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden;-webkit-text-size-adjust:100%}
+body{
+  background:var(--ink);color:var(--ink);font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;overflow-x:clip;
+  -webkit-tap-highlight-color:transparent;
+}
+body.has-cursor,body.has-cursor a,body.has-cursor button{cursor:none}
+::selection{background:var(--blue);color:#fff}
+a{color:inherit;text-decoration:none}
+canvas{display:block}
+
+.skip-link{position:absolute;left:-9999px;top:0;z-index:10000;background:#fff;color:var(--blue);padding:12px 18px;font-family:var(--mono);font-size:13px}
+.skip-link:focus{left:var(--gutter);top:12px}
+
+/* ============================================================
+   BOOT SEQUENCE
+   ============================================================ */
+#boot{
+  position:fixed;inset:0;z-index:999;background:var(--ink);color:#7ef29a;
+  font-family:var(--mono);font-size:13px;line-height:2;
+  padding:calc(var(--gutter) + 20px);
+  transition:opacity .5s,visibility .5s;
+}
+#boot.done{opacity:0;visibility:hidden;pointer-events:none}
+#boot .cur{display:inline-block;width:8px;height:15px;background:#7ef29a;vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ============================================================
+   CUSTOM CURSOR — crosshair, spins on links
+   ============================================================ */
+#cursor{
+  position:fixed;z-index:998;pointer-events:none;left:0;top:0;
+  width:26px;height:26px;mix-blend-mode:difference;
+  will-change:transform;display:none;
+}
+body.has-cursor #cursor{display:block}
+#cursor::before,#cursor::after{content:"";position:absolute;background:#fff;transition:transform .12s ease-out}
+#cursor::before{left:12px;top:0;width:2px;height:26px}
+#cursor::after{top:12px;left:0;height:2px;width:26px}
+#cursor.hot::before,#cursor.hot::after{transform:rotate(45deg) scale(1.35)}
+
+/* ============================================================
+   CHROME — nav, scrollbar, frame index
+   ============================================================ */
+.chrome{position:fixed;inset:0;z-index:50;pointer-events:none;font-family:var(--mono);font-size:11px;letter-spacing:.08em}
+.nav{
+  pointer-events:auto;position:absolute;top:0;left:0;right:0;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:calc(12px + var(--safe-top)) var(--gutter) 12px;
+  mix-blend-mode:difference;color:#fff;
+}
+.nav .brand{font-weight:600;text-transform:uppercase;flex-shrink:0}
+.nav .links{display:flex;gap:clamp(10px,2.5vw,22px);flex-wrap:wrap;justify-content:flex-end}
+.nav .links a{opacity:.75;transition:opacity .2s;min-height:44px;display:inline-flex;align-items:center;padding:4px 2px}
+.nav .links a:hover,.nav .links a:focus-visible{opacity:1}
+.nav a:focus-visible{outline:1px dashed currentColor;outline-offset:4px}
+#scrollbar{position:absolute;top:0;left:0;height:2px;background:#fff;mix-blend-mode:difference;width:0}
+.frame-index{
+  position:absolute;right:var(--gutter);top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:9px;mix-blend-mode:difference;color:#fff;
+}
+.frame-index span{opacity:.35;transition:opacity .25s}
+.frame-index span.on{opacity:1}
+
+/* ============================================================
+   THE DECK — sticky card stack
+   ============================================================ */
+.stack{position:relative}
+.panel{
+  position:-webkit-sticky;position:sticky;top:0;
+  height:100vh;height:100svh;min-height:620px;overflow:hidden;
+  border-radius:var(--card-radius) var(--card-radius) 0 0;
+  transform-origin:center top;
+  display:flex;flex-direction:column;
+  isolation:isolate;
+}
+.panel-inner{
+  flex:1;display:flex;flex-direction:column;justify-content:center;
+  padding:calc(var(--gutter) + 40px) var(--gutter) calc(var(--gutter) + var(--safe-bottom));
+  position:relative;z-index:2;
+}
+.panel-tab{
+  position:absolute;top:0;left:0;right:0;z-index:3;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px var(--gutter);
+  font-family:var(--mono);font-size:clamp(10px,2.5vw,11px);letter-spacing:.12em;text-transform:uppercase;
+  border-bottom:1px solid var(--line);
+}
+.panel-tab .dotline{flex:1;margin:0 18px;border-top:1px dashed currentColor;opacity:.25}
+.art{position:absolute;inset:0;z-index:1;width:100%;height:100%}
+
+.eyebrow{font-family:var(--mono);font-size:clamp(10px,2.8vw,12px);letter-spacing:.18em;text-transform:uppercase;opacity:.65;margin-bottom:18px}
+.display{font-weight:700;line-height:.94;letter-spacing:-.02em;font-size:clamp(40px,9vw,128px);text-wrap:balance}
+.lede{font-size:clamp(15px,1.6vw,19px);line-height:1.65;max-width:54ch;opacity:.85;margin-top:26px}
+.mono-note{font-family:var(--mono);font-size:12px;opacity:.55;margin-top:14px}
+.btn{
+  font-family:var(--mono);font-size:13px;letter-spacing:.06em;
+  padding:13px 24px;border-radius:8px;border:1px solid rgba(255,255,255,.5);
+  color:#fff;background:transparent;transition:transform .2s,background .2s;
+  min-height:48px;display:inline-flex;align-items:center;justify-content:center;user-select:none;
+}
+.btn.solid{background:#fff;color:var(--blue);border-color:#fff}
+.btn:hover{transform:translateY(-2px)}
+.btn:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+/* ============================================================
+   CARD THEMES — one class per little world
+   ============================================================ */
+
+/* 01 ignition */
+.p1{background:var(--blue);color:#fff;border-radius:0}
+.p1 .display{max-width:16ch;text-shadow:0 2px 40px rgba(0,0,60,.4)}
+.p1 .cta-row{display:flex;gap:14px;margin-top:40px;flex-wrap:wrap}
+.p1 .panel-tab{border-color:var(--line-blue)}
+
+/* 02 machine */
+.p2{background:var(--paper)}
+.p2::before{
+  content:"";position:absolute;inset:0;z-index:0;
+  background:
+    linear-gradient(var(--line) 1px,transparent 1px) 0 0/100% 72px,
+    linear-gradient(90deg,var(--line) 1px,transparent 1px) 0 0/72px 100%;
+  opacity:.45;
+}
+.p2 .grid2{display:grid;grid-template-columns:1fr 1.1fr;gap:40px;align-items:center}
+.p2 .spec{font-family:var(--mono);font-size:13px;line-height:2.1;border-left:2px solid var(--blue);padding-left:22px;margin-top:26px}
+.p2 .spec b{color:var(--blue)}
+.p2 .turbine-wrap{position:relative;aspect-ratio:1.15;max-height:66svh}
+.p2 .turbine-wrap canvas{position:absolute;inset:0;width:100%;height:100%}
+
+/* 03 launch */
+.p3{background:#07070f;color:var(--paper)}
+.p3 .panel-tab{border-color:rgba(242,240,233,.18)}
+.p3 .display{font-size:clamp(36px,6vw,80px)}
+
+/* 04 singularity */
+.p4{background:#020208;color:#fff}
+.p4 .panel-tab{border-color:rgba(255,255,255,.14)}
+.p4 .panel-inner{justify-content:flex-end}
+.skill-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;font-family:var(--mono);font-size:12px}
+.skill-chips span{border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:8px 16px;backdrop-filter:blur(4px);background:rgba(0,0,0,.3);transition:.2s}
+.skill-chips span:hover{border-color:#fff;background:rgba(0,0,242,.35)}
+
+/* 05 source */
+.p5{background:#03110d;color:#f4ead2}
+.p5 .panel-tab{border-color:rgba(244,234,210,.18)}
+.p5 .display{font-size:clamp(34px,5.5vw,78px)}
+.p5 .eyebrow{color:var(--gold);opacity:.9}
+.p5 .flow-legend{margin-top:30px;font-family:var(--mono);font-size:12px;line-height:2;border-left:2px solid var(--gold);padding-left:20px;opacity:.8;max-width:44ch}
+
+/* 06 great wave */
+.p6{background:var(--jp-sky);color:var(--jp-blue)}
+.p6 .panel-tab{border-color:rgba(22,52,79,.3)}
+.p6 .panel-inner{justify-content:flex-start;padding-top:calc(var(--gutter) + 64px)}
+.p6 .display{font-size:clamp(34px,6vw,86px);color:var(--jp-blue)}
+.p6 .eyebrow{color:var(--jp-blue)}
+.p6 .hanko{
+  display:inline-block;margin-top:24px;padding:10px 12px;
+  border:2px solid #b3402e;color:#b3402e;
+  font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  writing-mode:vertical-rl;
+}
+
+/* 07 the rain */
+.prain{background:#020604;color:#c8ffd9}
+.prain .panel-tab{border-color:rgba(200,255,217,.15)}
+.prain .display{font-size:clamp(34px,6vw,84px);text-shadow:0 0 30px rgba(60,255,140,.25)}
+.prain .eyebrow{color:#3cff8c}
+.prain .panel-inner{justify-content:flex-end;pointer-events:none}
+
+/* 08 the observer */
+.peye{background:var(--paper)}
+.peye .display{font-size:clamp(34px,5.5vw,76px)}
+.peye .telemetry{
+  margin-top:30px;font-family:var(--mono);font-size:12.5px;line-height:2.1;
+  border-left:2px solid var(--blue);padding-left:20px;max-width:46ch;
+}
+.peye .telemetry b{color:var(--blue)}
+
+/* 09 cmr africa */
+.pcmr{background:var(--cmr-night);color:var(--cmr-aether)}
+.pcmr .panel-tab{border-color:rgba(248,241,227,.18)}
+.pcmr .display{font-size:clamp(30px,5.5vw,72px)}
+.pcmr .eyebrow{color:var(--cmr-air);opacity:.95}
+.pcmr .element-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.pcmr .element-row span{padding:8px 14px;border-radius:999px;border:1px solid rgba(248,241,227,.28);display:inline-flex;align-items:center;gap:8px}
+.pcmr .element-row i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.pcmr .element-row .e-earth i{background:var(--cmr-earth)}
+.pcmr .element-row .e-fire i{background:var(--cmr-fire)}
+.pcmr .element-row .e-water i{background:var(--cmr-water)}
+.pcmr .element-row .e-air i{background:var(--cmr-air)}
+.pcmr .element-row .e-aether i{background:var(--cmr-aether)}
+.pcmr .cta-row{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
+.pcmr .btn{border-color:rgba(248,241,227,.45);color:var(--cmr-aether)}
+.pcmr .btn.solid{background:var(--cmr-air);color:var(--cmr-night);border-color:var(--cmr-air)}
+
+/* 10 constellation / comms */
+.p7{background:var(--paper)}
+.p7 .display a{border-bottom:4px solid var(--blue);transition:.2s}
+.p7 .display a:hover{color:var(--blue)}
+.p7 .socials{display:flex;gap:clamp(16px,4vw,26px);margin-top:44px;font-family:var(--mono);font-size:13px;flex-wrap:wrap}
+.p7 .socials a{border-bottom:1px solid var(--line);padding:10px 2px 3px;min-height:44px;display:inline-flex;align-items:center}
+.p7 .socials a:hover{color:var(--blue);border-color:var(--blue)}
+
+/* ~~ signal finale */
+.p8{background:#05050c;color:#fff}
+.p8 .panel-inner{justify-content:flex-end;pointer-events:none}
+.p8 .display{font-size:clamp(34px,6vw,84px)}
+.p8 .panel-tab{border-color:rgba(255,255,255,.15)}
+
+/* ============================================================
+   RESPONSIVE + MOTION
+   ============================================================ */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  #boot{display:none}
+  #boot .cur{animation:none}
+}
+@media (max-width:760px){
+  .panel{border-radius:14px 14px 0 0}
+  .p2 .grid2{grid-template-columns:1fr;gap:20px}
+  .p2 .turbine-wrap{max-height:38svh}
+  .frame-index{display:none}
+  .p6 .hanko{display:none}
+  .btn{flex:1 1 auto;min-width:min(100%,130px)}
+  .p1 .cta-row,.pcmr .cta-row{width:100%}
+  .nav .links a{font-size:10px}
+}
