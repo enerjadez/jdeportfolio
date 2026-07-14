@@ -150,21 +150,19 @@ function onScrollRaw(){
   }
   animSet=set.length?set:[0];
   activeIdx=active;
-  if(!REDUCE){
-    for(let i=0;i<cards.length;i++){
-      const nt=i+1<cards.length?tops[i+1]:vh;
-      const covered=Math.min(1,Math.max(0,1-nt/vh));
-      const st=cards[i].el.style;
-      /* only cards mid-transition carry fold styles — fully buried
-         cards are invisible under the stack, so clearing keeps the
-         compositor from holding 11 transformed layers alive */
-      if(covered>0&&covered<1){
-        st.transform=`scale(${1-covered*.07}) translateY(${covered*-18}px)`;
-        cards[i].shade.style.opacity=(covered*.5).toFixed(3);
-      }else{
-        st.transform='';
-        cards[i].shade.style.opacity=covered>=1?'0.5':'0';
-      }
+  for(let i=0;i<cards.length;i++){
+    const nt=i+1<cards.length?tops[i+1]:vh;
+    const covered=Math.min(1,Math.max(0,1-nt/vh));
+    const st=cards[i].el.style;
+    /* only cards mid-transition carry fold styles — fully buried
+       cards are invisible under the stack, so clearing keeps the
+       compositor from holding 11 transformed layers alive */
+    if(covered>0&&covered<1){
+      st.transform=`scale(${1-covered*.07}) translateY(${covered*-18}px)`;
+      cards[i].shade.style.opacity=(covered*.5).toFixed(3);
+    }else{
+      st.transform='';
+      cards[i].shade.style.opacity=covered>=1?'0.5':'0';
     }
   }
   const idx=document.querySelectorAll('#frameIndex span');
@@ -248,16 +246,16 @@ function init(){
   addEventListener('scroll',onScroll,{passive:true});
   addEventListener('resize',()=>{for(const c of cards)c.w=0;onScroll();},{passive:true});
   onScrollRaw();
-  if(REDUCE){
-    /* static show: one beautiful frame per card, no motion */
-    const drawAll=()=>{for(const c of cards)drawCard(c);};
-    drawAll();
-    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(drawAll);
-  }else{
-    for(const i of animSet)drawCard(cards[i]);
-    requestAnimationFrame(tick);
-  }
-  console.info(`[JDE] deck up · ${cards.length} cards · dpr ${DPR}`);
+  /* The deck always animates. prefers-reduced-motion is often set by
+     Windows "animation effects off" (a performance toggle, not a
+     vestibular need) and it froze every prior build of this site at
+     frame zero. This site's content IS the motion — under REDUCE we
+     skip the boot intro and smooth scrolling, nothing else. */
+  for(const i of animSet)drawCard(cards[i]);
+  if(document.fonts&&document.fonts.ready)
+    document.fonts.ready.then(()=>{for(const i of animSet)drawCard(cards[i]);});
+  requestAnimationFrame(tick);
+  console.info(`[JDE] deck up · ${cards.length} cards · dpr ${DPR} · reduce ${REDUCE}`);
 }
 
 return {card,init,P,noise2,fbm,REDUCE,MOBILE,COARSE,DPR,
