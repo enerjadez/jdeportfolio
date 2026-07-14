@@ -67,11 +67,16 @@ canvas{display:block}
   font-family:var(--mono);font-size:13px;line-height:2;
   padding:calc(var(--gutter)+20px + var(--safe-top)) var(--gutter);
   transition:opacity .55s cubic-bezier(.4,0,.2,1),visibility .55s;
+  overflow:auto;-webkit-overflow-scrolling:touch;
 }
 #boot.done{opacity:0;visibility:hidden;pointer-events:none}
-#boot .cur{display:inline-block;width:8px;height:15px;background:#7ef29a;vertical-align:-2px;animation:blink 1s steps(1) infinite}
+#bootLines{min-height:1.5em}
+#boot .cur{
+  display:inline-block;width:8px;height:15px;background:#7ef29a;vertical-align:-2px;
+  animation:bootblink 1s steps(1) infinite;
+}
 #boot .hint{opacity:.4;margin-top:18px;font-size:11px;letter-spacing:.08em}
-@keyframes blink{50%{opacity:0}}
+@keyframes bootblink{0%,49%{opacity:1}50%,100%{opacity:0}}
 
 /* ============================================================
    CUSTOM CURSOR + TRAIL
@@ -133,11 +138,24 @@ body.has-cursor #cursor-ring{display:block}
    ============================================================ */
 .stack{position:relative}
 .panel{
-  position:sticky;top:0;height:100svh;min-height:620px;overflow:hidden;
+  /* NEVER put transform/filter on this node — it kills position:sticky on desktop */
+  position:sticky;top:0;height:100vh;height:100dvh;min-height:620px;overflow:hidden;
   border-radius:var(--card-radius) var(--card-radius) 0 0;
-  transform-origin:center top;will-change:transform,filter;
   display:flex;flex-direction:column;
   box-shadow:0 -12px 40px rgba(0,0,0,.25);
+}
+.panel-stage{
+  position:absolute;inset:0;width:100%;height:100%;
+  display:flex;flex-direction:column;
+  transform-origin:center top;pointer-events:none;
+}
+.panel-stage > .art,
+.panel-stage > canvas.art{position:absolute;inset:0;z-index:1;width:100%;height:100%}
+.panel-stage .panel-inner{position:relative;z-index:2;flex:1;pointer-events:none}
+.panel-stage .panel-tab{pointer-events:none}
+.panel-stage canvas,.panel-stage .turbine-wrap,
+.panel-stage a,.panel-stage button,.panel-stage .interactive,.panel-stage .skill-chips{
+  pointer-events:auto;
 }
 .panel-inner{
   flex:1;display:flex;flex-direction:column;justify-content:center;
@@ -294,8 +312,8 @@ body.has-cursor #cursor-ring{display:block}
 .p8 .panel-tab{border-color:rgba(255,255,255,.15)}
 
 @media (prefers-reduced-motion:reduce){
-  *{animation:none!important;transition:none!important}
-  #boot{display:none}
+  #boot{display:none!important}
+  .panel-stage{transform:none!important;filter:none!important}
 }
 @media (max-width:760px){
   .p2 .grid2{grid-template-columns:1fr}
@@ -433,7 +451,7 @@ body.has-cursor #cursor-ring{display:block}
 
   <!-- 07 THE PRISM — NEW -->
   <section class="panel pprism" id="prism" data-act="6" aria-label="Act 07 The Prism">
-    <canvas class="art" id="prism" aria-hidden="true"></canvas>
+    <canvas class="art" id="prismCanvas" aria-hidden="true"></canvas>
     <div class="panel-tab"><span class="act-num">Act 07</span><span class="dotline"></span><span>The Prism</span></div>
     <div class="panel-inner">
       <p class="eyebrow">Chromatic refraction · three channels of light</p>
@@ -532,7 +550,15 @@ function fbm(x,y){ return noise2(x,y)*.6 + noise2(x*2.1,y*2.1)*.3 + noise2(x*4.3
    ============================================================ */
 (() => {
   const boot=document.getElementById('boot'), lines=document.getElementById('bootLines');
-  if(REDUCE){ boot.classList.add('done'); return; }
+  if(!boot) return;
+  let finished=false;
+  const finish=()=>{
+    if(finished) return;
+    finished=true;
+    boot.classList.add('done');
+    boot.setAttribute('aria-hidden','true');
+  };
+  if(REDUCE){ finish(); return; }
   const script=[
     '> reality.boot --showcase',
     '> loading wavefunctions ......... ok',
@@ -541,14 +567,21 @@ function fbm(x,y){ return noise2(x,y)*.6 + noise2(x*2.1,y*2.1)*.3 + noise2(x*4.3
     '> calibrating prism ............. ok',
     '> assembling lattice ............ ok',
     '> locating the source ........... found',
-    '> productivity(reality) += ∞',
+    '> productivity(reality) += infinity',
   ];
   let i=0;
   const iv=setInterval(()=>{
+    if(finished){ clearInterval(iv); return; }
+    if(!lines){ clearInterval(iv); finish(); return; }
     const d=document.createElement('div'); d.textContent=script[i]; lines.appendChild(d);
-    if(++i>=script.length){ clearInterval(iv); setTimeout(()=>boot.classList.add('done'),420); }
-  },145);
-  boot.addEventListener('click',()=>boot.classList.add('done'));
+    if(++i>=script.length){ clearInterval(iv); setTimeout(finish,380); }
+  },140);
+  const skip=()=>{ clearInterval(iv); finish(); };
+  boot.addEventListener('click',skip);
+  boot.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '||e.key==='Escape') skip(); });
+  boot.tabIndex=0;
+  /* hard failsafe — never leave the user trapped on the boot screen */
+  setTimeout(finish, 2400);
 })();
 
 /* ============================================================
@@ -563,7 +596,8 @@ function fbm(x,y){ return noise2(x,y)*.6 + noise2(x*2.1,y*2.1)*.3 + noise2(x*4.3
   (function tick(){
     x+=(MXpx-x)*.28; y+=(MYpx-y)*.28;
     rx+=(MXpx-rx)*.12; ry+=(MYpx-ry)*.12;
-    c.style.transform=`translate3d(${x}px,${y}px,0)`;
+    /* center the 26px crosshair on the pointer */
+    c.style.transform=`translate3d(${(x-13)|0}px,${(y-13)|0}px,0)`;
     ring.style.transform=`translate3d(${rx}px,${ry}px,0)`;
     requestAnimationFrame(tick);
   })();
@@ -625,26 +659,42 @@ function fbm(x,y){ return noise2(x,y)*.6 + noise2(x*2.1,y*2.1)*.3 + noise2(x*4.3
    Canvas loop — only while on screen
    ============================================================ */
 function loop(canvas, draw, opts={}){
+  if(!canvas || typeof canvas.getContext!=='function'){
+    console.warn('[showcase] loop: invalid canvas', canvas);
+    return;
+  }
   const ctx=canvas.getContext('2d',{alpha:true});
+  if(!ctx) return;
   let w=0,h=0,raf=null,visible=false,t=0;
   function size(){
-    w=canvas.clientWidth; h=canvas.clientHeight;
-    if(w<1||h<1) return;
+    w=canvas.clientWidth||canvas.offsetWidth; h=canvas.clientHeight||canvas.offsetHeight;
+    if(w<1||h<1){
+      /* sticky panels can report 0 before first layout — retry once */
+      requestAnimationFrame(()=>{
+        w=canvas.clientWidth||canvas.offsetWidth; h=canvas.clientHeight||canvas.offsetHeight;
+        if(w<1||h<1) return;
+        canvas.width=w*DPR; canvas.height=h*DPR;
+        ctx.setTransform(DPR,0,0,DPR,0,0);
+        if(opts.onResize) opts.onResize(w,h);
+      });
+      return;
+    }
     canvas.width=w*DPR; canvas.height=h*DPR;
     ctx.setTransform(DPR,0,0,DPR,0,0);
     if(opts.onResize) opts.onResize(w,h);
   }
   function frame(){
-    draw(ctx,w,h,t); t+=1/60;
+    try{ draw(ctx,w,h,t); }catch(err){ console.warn('[showcase] draw error', err); }
+    t+=1/60;
     if(visible&&!REDUCE) raf=requestAnimationFrame(frame);
   }
   new IntersectionObserver(([e])=>{
     visible=e.isIntersecting;
     if(visible){ size(); cancelAnimationFrame(raf); frame(); }
     else cancelAnimationFrame(raf);
-  },{threshold:.02}).observe(canvas);
+  },{threshold:.02,rootMargin:'10% 0px'}).observe(canvas);
   addEventListener('resize',()=>{ if(visible) size(); },{passive:true});
-  size(); if(w>0) draw(ctx,w,h,0);
+  size(); if(w>0){ try{ draw(ctx,w,h,0); }catch(_){} }
 }
 
 /* ============================================================
@@ -1194,7 +1244,7 @@ function loop(canvas, draw, opts={}){
    Cursor shifts the incidence angle.
    ============================================================ */
 (() => {
-  const cv=document.getElementById('prism');
+  const cv=document.getElementById('prismCanvas');
   let beams=null;
 
   function init(w,h){
@@ -1673,6 +1723,16 @@ function loop(canvas, draw, opts={}){
   const bar=document.getElementById('scrollbar');
   let ticking=false;
 
+  /* Optional depth cue on INNER stage only — never on the sticky panel itself */
+  panels.forEach(p=>{
+    if(p.querySelector('.panel-stage')) return;
+    const stage=document.createElement('div');
+    stage.className='panel-stage';
+    while(p.firstChild) stage.appendChild(p.firstChild);
+    p.appendChild(stage);
+  });
+  const stages=panels.map(p=>p.querySelector('.panel-stage'));
+
   function onScroll(){
     const vh=innerHeight; let active=0;
     panels.forEach((p,i)=>{
@@ -1683,15 +1743,17 @@ function loop(canvas, draw, opts={}){
         const nr=next.getBoundingClientRect();
         covered=Math.min(1,Math.max(0,1-nr.top/vh));
       }
-      if(!REDUCE){
-        p.style.transform=`scale(${1-covered*.06}) translateY(${covered*-14}px)`;
-        p.style.filter=`brightness(${1-covered*.4})`;
+      /* Depth scale on the inner stage only. Sticky stays clean. */
+      const stage=stages[i];
+      if(stage && !REDUCE){
+        stage.style.transform=`scale(${1-covered*.04})`;
+        stage.style.filter=covered>0.02?`brightness(${1-covered*.35})`:'none';
       }
       if(r.top<=vh*.5) active=i;
     });
     idx.forEach((s,i)=>s.classList.toggle('on',i===active));
     const max=document.documentElement.scrollHeight-innerHeight;
-    bar.style.width=(max>0?scrollY/max*100:0)+'%';
+    if(bar) bar.style.width=(max>0?scrollY/max*100:0)+'%';
     ticking=false;
   }
   function requestScroll(){
