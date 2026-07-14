@@ -7,7 +7,9 @@
 (()=>{
 const {P,fbm,MOBILE}=JDE;
 let pts=null,W=0,H=0;
-const N=MOBILE?1100:2200;
+let N=MOBILE?900:1500;         /* self-tunes down if the device struggles */
+const N_FLOOR=600;
+let slow=0,checked=0;
 const PULSE_EVERY=2.4,PULSE_SPEED=260;
 
 function spawn(w,h,anywhere){
@@ -35,6 +37,7 @@ JDE.card({
   resize(w,h){reset(w,h);},
   draw(ctx,w,h,t){
     if(!pts||W!==w||H!==h)reset(w,h);
+    const frameStart=performance.now();
     ctx.fillStyle='rgba(3,17,13,.09)';ctx.fillRect(0,0,w,h);
 
     const sx=w*.22,sy=h*.62;
@@ -71,6 +74,16 @@ JDE.card({
     ctx.strokeStyle=`rgba(232,180,74,${Math.max(0,.5-pt2*.2)})`;
     ctx.lineWidth=1.2;
     ctx.beginPath();ctx.arc(sx,sy,pulseR,0,7);ctx.stroke();
+
+    /* adaptive quality: if this world costs >14ms a frame on this
+       device, shed particles until it doesn't (floor 600) */
+    if(N>N_FLOOR){
+      if(performance.now()-frameStart>14)slow++;
+      if(++checked>=30){
+        if(slow>15){N=Math.max(N_FLOOR,(N*.7)|0);pts.length=N;}
+        slow=0;checked=0;
+      }
+    }
   },
 });
 })();

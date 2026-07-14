@@ -30,7 +30,7 @@ const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const MOBILE=matchMedia('(max-width:760px)').matches;
 const COARSE=matchMedia('(pointer:coarse)').matches;
 const FINE=matchMedia('(pointer:fine)').matches;
-const DPR=Math.min(devicePixelRatio||1,2);
+const DPR=Math.min(devicePixelRatio||1,1.5);
 
 /* ---- shared pointer state (viewport space) ---- */
 const P={x:.5,y:.5,px:innerWidth/2,py:innerHeight/2};
@@ -84,9 +84,14 @@ function build(){
       canvas.className='art';canvas.setAttribute('aria-hidden','true');
       el.insertBefore(canvas,el.firstChild);
     }
+    /* fold dimmer — a plain black overlay is far cheaper to composite
+       than a brightness() filter on a full-screen sticky layer */
+    const shade=document.createElement('div');
+    shade.className='panel-shade';shade.setAttribute('aria-hidden','true');
+    el.appendChild(shade);
     main.appendChild(el);
     const c={
-      def,el,canvas,
+      def,el,canvas,shade,
       host:canvas?canvas.parentElement:el,
       ctx:canvas?canvas.getContext('2d'):null,
       w:0,h:0,t:0,every:def.every||1,errs:0,dead:!canvas,
@@ -150,10 +155,16 @@ function onScrollRaw(){
       const nt=i+1<cards.length?tops[i+1]:vh;
       const covered=Math.min(1,Math.max(0,1-nt/vh));
       const st=cards[i].el.style;
-      if(covered>0){
+      /* only cards mid-transition carry fold styles — fully buried
+         cards are invisible under the stack, so clearing keeps the
+         compositor from holding 11 transformed layers alive */
+      if(covered>0&&covered<1){
         st.transform=`scale(${1-covered*.07}) translateY(${covered*-18}px)`;
-        st.filter=`brightness(${1-covered*.45})`;
-      }else{st.transform='';st.filter='';}
+        cards[i].shade.style.opacity=(covered*.5).toFixed(3);
+      }else{
+        st.transform='';
+        cards[i].shade.style.opacity=covered>=1?'0.5':'0';
+      }
     }
   }
   const idx=document.querySelectorAll('#frameIndex span');

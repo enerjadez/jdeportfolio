@@ -107,6 +107,7 @@ body.has-cursor #cursor{display:block}
 }
 .panel-tab .dotline{flex:1;margin:0 18px;border-top:1px dashed currentColor;opacity:.25}
 .art{position:absolute;inset:0;z-index:1;width:100%;height:100%}
+.panel-shade{position:absolute;inset:0;z-index:4;background:#000;opacity:0;pointer-events:none}
 
 .eyebrow{font-family:var(--mono);font-size:clamp(10px,2.8vw,12px);letter-spacing:.18em;text-transform:uppercase;opacity:.65;margin-bottom:18px}
 .display{font-weight:700;line-height:.94;letter-spacing:-.02em;font-size:clamp(40px,9vw,128px);text-wrap:balance}
@@ -178,6 +179,7 @@ body.has-cursor #cursor{display:block}
   border:2px solid #b3402e;color:#b3402e;
   font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
   writing-mode:vertical-rl;
+  align-self:flex-start; /* flex column would stretch the stamp full-width */
 }
 
 /* 07 the rain */
